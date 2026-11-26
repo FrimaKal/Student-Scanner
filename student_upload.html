@@ -441,6 +441,7 @@
   const params = new URLSearchParams(window.location.search);
   const FOLDER = (params.get('folder') || '').trim();
   const CODE = (params.get('k') || '').trim();
+  const DEBUG = params.get('debug') === '1';
 
   const ERROR_MSGS = {
     INVALID_ACCESS: 'הקישור לא תקין – בקשו מהמורה קישור חדש',
@@ -707,10 +708,14 @@
     }
 
     if (!data || data.ok !== true) {
-      if (data && data.message) {
-        console.error('[upload] ' + (data.errorCode || 'ERROR') + ': ' + data.message);
+      var errorCode = data && data.errorCode ? data.errorCode : 'NETWORK';
+      var errorMessage = data && data.message ? data.message : '';
+      if (errorMessage) {
+        console.error('[upload] ' + errorCode + ': ' + errorMessage);
       }
-      throw new AppError(data && data.errorCode ? data.errorCode : 'NETWORK');
+      var uploadError = new AppError(errorCode);
+      uploadError.detail = errorMessage;
+      throw uploadError;
     }
     return data.data || {};
   }
@@ -805,7 +810,11 @@
       hideOverlay();
       updateControls();
       var code = err instanceof AppError ? err.code : 'NETWORK';
-      showToast(ERROR_MSGS[code] || ERROR_MSGS.NETWORK);
+      var message = ERROR_MSGS[code] || ERROR_MSGS.NETWORK;
+      if (DEBUG && err && err.detail) {
+        message += ' [' + code + ': ' + err.detail + ']';
+      }
+      showToast(message);
     }
   }
 
