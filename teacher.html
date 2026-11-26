@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Student Upload Link - Teacher Setup</title>
+<title>Teacher Upload Setup</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -53,7 +53,7 @@
     font-size: 1.9rem;
   }
   header h1 { margin: 0 0 8px; font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; }
-  header p { margin: 0 auto; max-width: 520px; color: var(--muted); font-size: 0.95rem; line-height: 1.55; }
+  header p { margin: 0 auto; max-width: 560px; color: var(--muted); font-size: 0.95rem; line-height: 1.55; }
 
   .card {
     background: #fff;
@@ -63,10 +63,12 @@
     padding: 24px;
     margin-bottom: 20px;
   }
-  .card h2 { margin: 0 0 16px; font-size: 1.05rem; font-weight: 800; }
+  .card h2 { margin: 0 0 14px; font-size: 1.05rem; font-weight: 800; }
+
+  .muted { color: var(--muted); font-size: 0.86rem; line-height: 1.55; }
+  .hint { display: block; margin-top: 6px; font-size: 0.77rem; font-weight: 400; color: var(--muted); line-height: 1.45; }
 
   label { display: block; font-size: 0.83rem; font-weight: 600; color: #3c4043; margin-bottom: 14px; }
-  .hint { display: block; margin-top: 6px; font-size: 0.77rem; font-weight: 400; color: var(--muted); line-height: 1.45; }
 
   input[type="url"], input[type="text"] {
     width: 100%;
@@ -107,6 +109,8 @@
   }
   .btn:hover { background: #f8fafc; }
   .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.55; cursor: default; transform: none; }
+  a.btn { text-decoration: none; }
   .btn.primary {
     background: var(--blue);
     border-color: var(--blue);
@@ -118,6 +122,62 @@
   }
   .btn.primary:hover { background: var(--blue-dark); }
   .btn.ghost { color: var(--blue); border-color: #c6dafc; }
+  .btn.small { font-size: 0.78rem; padding: 7px 11px; min-height: 34px; border-radius: 8px; }
+
+  .steps-list {
+    margin: 0 0 16px;
+    padding-left: 20px;
+    color: var(--muted);
+    font-size: 0.87rem;
+    line-height: 1.65;
+  }
+  .steps-list li { margin-bottom: 4px; }
+  .steps-list a { color: var(--blue); font-weight: 600; text-decoration: none; }
+  .steps-list a:hover { text-decoration: underline; }
+
+  .share-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: #f8faff;
+    border: 1px solid #c6dafc;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+  .share-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+  .share-box strong { font-size: 0.95rem; color: var(--ink); word-break: break-all; }
+
+  .advanced {
+    margin: 4px 0 16px;
+    border-top: 1px solid var(--line);
+    padding-top: 12px;
+  }
+  .advanced summary { cursor: pointer; font-size: 0.82rem; font-weight: 600; color: var(--muted); }
+  .advanced summary:hover { color: var(--ink); }
+  .advanced label { margin-top: 12px; margin-bottom: 0; }
+
+  .connection-status {
+    margin: 14px 0 0;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    line-height: 1.55;
+    word-break: break-word;
+  }
+  .connection-status.info { background: #f8fafc; color: var(--muted); border: 1px solid var(--line); }
+  .connection-status.success { background: #e6f4ea; color: #137333; border: 1px solid #b7e1c1; }
+  .connection-status.error { background: #fce8e6; color: #a50e0e; border: 1px solid #f6c7c3; }
 
   .result { text-align: center; }
   .result h2 { margin-bottom: 4px; }
@@ -158,19 +218,6 @@
   }
   .note strong { color: var(--ink); }
 
-  .connection-status {
-    margin: 14px 0 0;
-    padding: 12px 14px;
-    border-radius: 10px;
-    font-size: 0.82rem;
-    font-weight: 500;
-    line-height: 1.55;
-    word-break: break-word;
-  }
-  .connection-status.info { background: #f8fafc; color: var(--muted); border: 1px solid var(--line); }
-  .connection-status.success { background: #e6f4ea; color: #137333; border: 1px solid #b7e1c1; }
-  .connection-status.error { background: #fce8e6; color: #a50e0e; border: 1px solid #f6c7c3; }
-
   .toast {
     position: fixed;
     left: 50%;
@@ -202,36 +249,66 @@
 <div class="wrap">
   <header>
     <div class="logo">🔗</div>
-    <h1>Student Upload Link</h1>
-    <p>Create one link or QR code. Students open it, enter their name, photograph their pages, and the PDF lands in your Google Drive. No accounts, no class lists.</p>
+    <h1>Teacher Upload Setup</h1>
+    <p>Connect your own Google Drive folder, then share one link with your students. Every teacher uses their own folder — no Apps Script deployment or Google sign-in is needed here.</p>
   </header>
 
   <div class="card">
-    <h2>Link settings</h2>
+    <h2>1. Connect your Drive folder</h2>
+    <ol class="steps-list">
+      <li>Open <a href="https://drive.google.com/drive/my-drive" target="_blank" rel="noopener">Google Drive</a> and create a folder.</li>
+      <li>Share that folder with the email below as <strong>Editor</strong>.</li>
+      <li>Paste the folder link here and click <strong>Connect folder</strong>.</li>
+    </ol>
+
+    <div class="share-box">
+      <div>
+        <div class="share-label">Share with this email</div>
+        <strong id="ownerEmail">Loading…</strong>
+      </div>
+      <button id="copyOwnerEmailBtn" type="button" class="btn small" disabled>Copy email</button>
+    </div>
+
+    <label>Drive folder link or ID
+      <input id="driveFolderInput" type="text" placeholder="https://drive.google.com/drive/folders/..." autocomplete="off">
+      <span class="hint">Use the folder you shared above. The app reads the folder name automatically.</span>
+    </label>
+
+    <label>Access code (optional)
+      <input id="accessCode" type="text" placeholder="Same as UPLOAD_CODE in Code.gs" maxlength="80" autocomplete="off">
+      <span class="hint">Required only if you set UPLOAD_CODE in the Apps Script.</span>
+    </label>
+
+    <details class="advanced">
+      <summary>Advanced: Apps Script URL</summary>
+      <label>Apps Script /exec URL
+        <input id="appsScriptUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
+        <span class="hint">Auto-detected from student_upload.html when it is on the same site. Change only if needed.</span>
+      </label>
+    </details>
+
+    <button id="connectFolderBtn" type="button" class="btn primary">Connect folder</button>
+    <p id="connectStatus" class="connection-status" hidden></p>
+  </div>
+
+  <div class="card">
+    <h2>2. Test the connection</h2>
+    <p class="muted">Uploads a tiny test PDF into the connected folder. You can delete it from Google Drive afterwards.</p>
+    <button id="testDriveBtn" type="button" class="btn">Test Drive connection</button>
+    <p id="connectionStatus" class="connection-status" hidden></p>
+  </div>
+
+  <div class="card">
+    <h2>3. Create the student link</h2>
     <label>Student page URL
       <input id="studentUrl" type="url" placeholder="https://yoursite.com/student_upload.html" autocomplete="off">
       <span class="hint">The address where you hosted <strong>student_upload.html</strong>.</span>
     </label>
-    <label>Drive folder name
+    <label>Folder name shown to students
       <input id="folderName" type="text" placeholder="Exam_Uploads" maxlength="60" autocomplete="off">
-      <span class="hint">Created automatically inside your Drive if it does not exist.</span>
-    </label>
-    <label>Access code (optional)
-      <input id="accessCode" type="text" placeholder="Leave blank to use no code" maxlength="80" autocomplete="off">
-      <span class="hint">If you set <strong>UPLOAD_CODE</strong> in Code.gs, enter the exact same value here.</span>
+      <span class="hint">Filled from the connected folder; you can change how it appears to students.</span>
     </label>
     <button id="generateBtn" type="button" class="btn primary">Create link and QR code</button>
-  </div>
-
-  <div class="card">
-    <h2>Check Drive connection</h2>
-    <p class="muted">Optional. Verifies that your Apps Script can create a PDF in the Drive folder. This creates a small test file named "Connection Test".</p>
-    <label>Apps Script /exec URL
-      <input id="appsScriptUrl" type="url" placeholder="https://script.google.com/macros/s/***/exec" autocomplete="off">
-      <span class="hint">The same /exec URL you placed inside student_upload.html. It is not shown to students.</span>
-    </label>
-    <button id="testDriveBtn" type="button" class="btn">Test Drive connection</button>
-    <p id="connectionStatus" class="connection-status" hidden></p>
   </div>
 
   <div id="resultCard" class="card result" hidden>
@@ -246,7 +323,7 @@
     </div>
   </div>
 
-  <p class="note"><strong>Generating the link does not need Google Drive access.</strong> Use <strong>Check Drive connection</strong> above to verify your Apps Script can write to Drive. The folder is created automatically on the first successful upload or test; open <strong>drive.google.com</strong> with the teacher account to see the PDFs. Keep the link private if you use an access code.</p>
+  <p class="note"><strong>Every teacher connects their own folder.</strong> The app account only gets edit access to the folder you share. No per-teacher Apps Script or Google sign-in is required. Keep the student link private if you use an access code.</p>
 </div>
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -255,21 +332,29 @@
 (function () {
   'use strict';
 
-  var STORAGE_KEY = 'uploadLinkSettingsV1';
+  var STORAGE_KEY = 'teacherUploadSetupV2';
+  var LEGACY_KEY = 'uploadLinkSettingsV1';
 
   var state = {
     link: '',
-    folder: '',
-    qrDataUrl: ''
+    qrDataUrl: '',
+    folderId: '',
+    folderName: '',
+    ownerEmail: ''
   };
 
   var el = {
-    studentUrl: document.getElementById('studentUrl'),
-    folderName: document.getElementById('folderName'),
+    ownerEmail: document.getElementById('ownerEmail'),
+    copyOwnerEmailBtn: document.getElementById('copyOwnerEmailBtn'),
+    driveFolderInput: document.getElementById('driveFolderInput'),
     accessCode: document.getElementById('accessCode'),
     appsScriptUrl: document.getElementById('appsScriptUrl'),
+    connectFolderBtn: document.getElementById('connectFolderBtn'),
+    connectStatus: document.getElementById('connectStatus'),
     testDriveBtn: document.getElementById('testDriveBtn'),
     connectionStatus: document.getElementById('connectionStatus'),
+    studentUrl: document.getElementById('studentUrl'),
+    folderName: document.getElementById('folderName'),
     generateBtn: document.getElementById('generateBtn'),
     resultCard: document.getElementById('resultCard'),
     resultFolder: document.getElementById('resultFolder'),
@@ -307,29 +392,50 @@
       .replace(/'/g, '&#39;');
   }
 
-  function loadSettings() {
-    var saved = null;
-    try {
-      saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-    } catch (err) {
-      saved = null;
+  async function copyText(text, successMessage) {
+    if (!text) {
+      return;
     }
-    var settings = saved || {};
-    el.studentUrl.value = settings.studentUrl || defaultStudentUrl();
-    el.folderName.value = settings.folderName || 'Exam_Uploads';
-    el.accessCode.value = settings.accessCode || '';
-    el.appsScriptUrl.value = settings.appsScriptUrl || '';
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        showToast(successMessage || 'Copied.');
+        return;
+      }
+    } catch (err) {}
+    try {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.focus();
+      area.select();
+      document.execCommand('copy');
+      document.body.removeChild(area);
+      showToast(successMessage || 'Copied.');
+    } catch (err) {
+      showToast('Copy failed. Please copy manually.');
+    }
   }
 
-  function saveSettings() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        studentUrl: el.studentUrl.value.trim(),
-        folderName: el.folderName.value.trim(),
-        accessCode: el.accessCode.value.trim(),
-        appsScriptUrl: el.appsScriptUrl.value.trim()
-      }));
-    } catch (err) {}
+  function extractFolderId(value) {
+    var text = String(value === null || value === undefined ? '' : value).trim();
+    if (!text) {
+      return '';
+    }
+    var folderMatch = text.match(/\/folders\/([A-Za-z0-9_-]{10,})/);
+    if (folderMatch) {
+      return folderMatch[1];
+    }
+    var idMatch = text.match(/[?&]id=([A-Za-z0-9_-]{10,})/);
+    if (idMatch) {
+      return idMatch[1];
+    }
+    if (/^[A-Za-z0-9_-]{10,}$/.test(text)) {
+      return text;
+    }
+    return '';
   }
 
   function sanitizeFolderName(value) {
@@ -341,7 +447,310 @@
       .trim();
   }
 
-  function buildLink(studentUrl, folderName, accessCode) {
+  function setOwnerEmail(value) {
+    el.ownerEmail.textContent = value;
+    var usable = value && value !== '—' && value !== 'Loading…';
+    el.copyOwnerEmailBtn.disabled = !usable;
+  }
+
+  function setConnectStatus(message, kind) {
+    el.connectStatus.textContent = message;
+    el.connectStatus.className = 'connection-status ' + (kind || 'info');
+    el.connectStatus.hidden = false;
+  }
+
+  function setConnectionStatus(message, kind) {
+    el.connectionStatus.textContent = message;
+    el.connectionStatus.className = 'connection-status ' + (kind || 'info');
+    el.connectionStatus.hidden = false;
+  }
+
+  function loadSettings() {
+    var saved = null;
+    try {
+      saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+    } catch (err) {
+      saved = null;
+    }
+    if (!saved) {
+      try {
+        saved = JSON.parse(localStorage.getItem(LEGACY_KEY) || 'null');
+      } catch (err) {
+        saved = null;
+      }
+    }
+    var settings = saved || {};
+    el.studentUrl.value = settings.studentUrl || defaultStudentUrl();
+    el.folderName.value = settings.folderName || '';
+    el.accessCode.value = settings.accessCode || '';
+    el.appsScriptUrl.value = settings.appsScriptUrl || '';
+    state.folderId = settings.driveFolderId || '';
+    state.folderName = settings.driveFolderName || '';
+    el.driveFolderInput.value = state.folderId || '';
+
+    if (state.folderId) {
+      setConnectStatus('Connected folder: "' + (state.folderName || state.folderId) + '". You can test it in step 2 and create the student link in step 3.', 'success');
+      if (!el.folderName.value) {
+        el.folderName.value = state.folderName || '';
+      }
+    }
+
+    var params = new URLSearchParams(window.location.search);
+    var execParam = params.get('exec');
+    if (execParam) {
+      el.appsScriptUrl.value = execParam;
+    }
+  }
+
+  function saveSettings() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        studentUrl: el.studentUrl.value.trim(),
+        folderName: el.folderName.value.trim(),
+        accessCode: el.accessCode.value.trim(),
+        appsScriptUrl: el.appsScriptUrl.value.trim(),
+        driveFolderId: state.folderId,
+        driveFolderName: state.folderName
+      }));
+    } catch (err) {}
+  }
+
+  async function discoverAppsScriptUrl() {
+    if (el.appsScriptUrl.value.trim()) {
+      return;
+    }
+    var studentUrl = el.studentUrl.value.trim() || defaultStudentUrl();
+    var pageUrl;
+    try {
+      pageUrl = new URL(studentUrl, window.location.href);
+    } catch (err) {
+      return;
+    }
+    if (pageUrl.origin !== window.location.origin) {
+      return;
+    }
+    try {
+      var response = await fetch(pageUrl.href, { cache: 'no-store' });
+      if (!response.ok) {
+        return;
+      }
+      var html = await response.text();
+      var match = html.match(/https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec/);
+      if (match && !el.appsScriptUrl.value.trim()) {
+        el.appsScriptUrl.value = match[0];
+      }
+    } catch (err) {
+      console.error('Could not read the student page to find the Apps Script URL:', err);
+    }
+  }
+
+  async function loadBackendInfo() {
+    var url = el.appsScriptUrl.value.trim();
+    if (!url) {
+      setOwnerEmail('—');
+      setConnectStatus('Could not find the Apps Script URL. Open "Advanced" and paste the /exec URL.', 'error');
+      return;
+    }
+
+    setOwnerEmail('Loading…');
+    try {
+      var response = await fetch(url, { method: 'GET', redirect: 'follow', cache: 'no-store' });
+      var text = await response.text();
+      var data;
+      try {
+        data = JSON.parse(text);
+      } catch (parseErr) {
+        setOwnerEmail('—');
+        setConnectStatus('The Apps Script URL returned HTML instead of JSON. The deployment is not public (or the URL is wrong). Set Execute as: Me and Who has access: Anyone, deploy a new version, and use the /exec URL.', 'error');
+        return;
+      }
+
+      if (!data || data.ok !== true) {
+        setOwnerEmail('—');
+        setConnectStatus('The Apps Script URL returned an unexpected response.', 'error');
+        return;
+      }
+
+      state.ownerEmail = data.ownerEmail || '';
+      setOwnerEmail(state.ownerEmail || '—');
+
+      if (!state.ownerEmail) {
+        setConnectStatus('The backend is reachable but did not return a sharing email. Deploy the new Code.gs as a new version.', 'error');
+      } else if (!state.folderId) {
+        setConnectStatus('Share your Drive folder with the email above as Editor, then paste the folder link below.', 'info');
+      }
+    } catch (err) {
+      console.error('Backend info error:', err);
+      setOwnerEmail('—');
+      setConnectStatus('Could not reach the Apps Script URL. Make sure it is the /exec URL and the deployment is public (Anyone).', 'error');
+    }
+  }
+
+  function folderErrorText(data, prefix) {
+    var code = data && data.errorCode ? data.errorCode : 'ERROR';
+    var message = data && data.message ? data.message : 'Unknown error';
+    var hint = '';
+    if (code === 'FOLDER_NOT_FOUND') {
+      hint = state.ownerEmail
+        ? ' Share the folder with ' + state.ownerEmail + ' as Editor.'
+        : ' Share the folder with the app email as Editor.';
+    } else if (code === 'FOLDER_ACCESS') {
+      hint = ' Change the folder permission to Editor (not Viewer).';
+    } else if (code === 'INVALID_FOLDER') {
+      hint = ' Paste a valid Google Drive folder link or ID.';
+    } else if (code === 'INVALID_ACCESS') {
+      hint = ' Check the access code (UPLOAD_CODE in Code.gs).';
+    }
+    return (prefix || 'Connection failed') + ': ' + code + ' — ' + message + hint;
+  }
+
+  async function connectFolder() {
+    var url = el.appsScriptUrl.value.trim();
+    if (!url) {
+      await discoverAppsScriptUrl();
+      url = el.appsScriptUrl.value.trim();
+    }
+    if (!url) {
+      setConnectStatus('Could not find the Apps Script URL. Open "Advanced" and paste the /exec URL.', 'error');
+      return;
+    }
+
+    var folderId = extractFolderId(el.driveFolderInput.value);
+    if (!folderId) {
+      setConnectStatus('Paste the Google Drive folder link or ID.', 'error');
+      return;
+    }
+
+    el.connectFolderBtn.disabled = true;
+    setConnectStatus('Checking the folder...', 'info');
+
+    try {
+      var response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: 'checkFolder',
+          folderId: folderId,
+          k: el.accessCode.value.trim()
+        }),
+        redirect: 'follow'
+      });
+      var text = await response.text();
+      var data;
+      try {
+        data = JSON.parse(text);
+      } catch (parseErr) {
+        setConnectStatus('The Apps Script URL returned HTML instead of JSON. The deployment is not public (or the URL is wrong).', 'error');
+        return;
+      }
+
+      if (data && data.ok === true) {
+        var info = data.data || {};
+        state.folderId = info.folderId || folderId;
+        state.folderName = info.folderName || '';
+        el.driveFolderInput.value = state.folderId;
+        if (!el.folderName.value.trim()) {
+          el.folderName.value = state.folderName || '';
+        }
+        saveSettings();
+        setConnectStatus('Folder connected: "' + (state.folderName || state.folderId) + '". You can test it in step 2 and create the student link in step 3.', 'success');
+        el.connectionStatus.hidden = true;
+        el.connectionStatus.textContent = '';
+      } else {
+        setConnectStatus(folderErrorText(data, 'Folder connection failed'), 'error');
+      }
+    } catch (err) {
+      console.error('Connect folder error:', err);
+      setConnectStatus('Could not reach the Apps Script URL. Check that it is the /exec URL and the deployment is public (Anyone).', 'error');
+    } finally {
+      el.connectFolderBtn.disabled = false;
+    }
+  }
+
+  function buildTestPdfBase64() {
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      throw new Error('PDF library did not load.');
+    }
+    var doc = new window.jspdf.jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    doc.setFontSize(18);
+    doc.text('Drive connection test', 20, 25);
+    doc.setFontSize(10);
+    doc.text('This file was created by the teacher page to verify the Drive connection.', 20, 35);
+    doc.text('You can delete it.', 20, 42);
+    var uri = doc.output('datauristring');
+    return uri.slice(uri.indexOf(',') + 1);
+  }
+
+  async function testDriveConnection() {
+    var url = el.appsScriptUrl.value.trim();
+    if (!url) {
+      await discoverAppsScriptUrl();
+      url = el.appsScriptUrl.value.trim();
+    }
+    if (!url) {
+      setConnectionStatus('Apps Script URL is missing. Open "Advanced" and paste it.', 'error');
+      return;
+    }
+    if (!state.folderId) {
+      setConnectionStatus('Connect your Drive folder first (step 1).', 'error');
+      return;
+    }
+
+    var inputId = extractFolderId(el.driveFolderInput.value);
+    if (inputId && inputId !== state.folderId) {
+      setConnectionStatus('The folder link changed. Click "Connect folder" first.', 'error');
+      return;
+    }
+
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      setConnectionStatus('The PDF library did not load. Check your internet connection and reload the page.', 'error');
+      return;
+    }
+
+    el.testDriveBtn.disabled = true;
+    setConnectionStatus('Testing... This creates a small PDF in the connected folder.', 'info');
+
+    try {
+      var pdfBase64 = buildTestPdfBase64();
+      var response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: 'upload',
+          name: 'Connection Test',
+          folder: state.folderName || el.folderName.value.trim(),
+          folderId: state.folderId,
+          k: el.accessCode.value.trim(),
+          mimeType: 'application/pdf',
+          fileBase64: pdfBase64
+        }),
+        redirect: 'follow'
+      });
+      var text = await response.text();
+      var data;
+      try {
+        data = JSON.parse(text);
+      } catch (parseErr) {
+        setConnectionStatus('The Apps Script URL returned HTML instead of JSON. The deployment is not public (or the URL is wrong).', 'error');
+        return;
+      }
+
+      if (data && data.ok === true) {
+        var savedName = data.data && data.data.fileName ? data.data.fileName : 'the test PDF';
+        var savedFolder = data.data && data.data.folderName ? data.data.folderName : (state.folderName || 'the connected folder');
+        setConnectionStatus('Drive connected. A test PDF was saved as "' + savedName + '" in the folder "' + savedFolder + '". You can delete it from Drive.', 'success');
+      } else {
+        setConnectionStatus(folderErrorText(data, 'Drive connection failed'), 'error');
+      }
+    } catch (err) {
+      console.error('Drive connection test error:', err);
+      setConnectionStatus('Could not reach the Apps Script URL. Check that it is the /exec URL and the deployment is public (Anyone).', 'error');
+    } finally {
+      el.testDriveBtn.disabled = false;
+    }
+  }
+
+  function buildLink(studentUrl, folderName, accessCode, folderId) {
     var url;
     try {
       url = new URL(studentUrl, window.location.href);
@@ -352,12 +761,51 @@
       return '';
     }
     url.searchParams.set('folder', folderName);
+    url.searchParams.set('folderId', folderId);
     if (accessCode) {
       url.searchParams.set('k', accessCode);
     } else {
       url.searchParams.delete('k');
     }
     return url.toString();
+  }
+
+  function generate() {
+    var studentUrl = el.studentUrl.value.trim();
+    var displayName = sanitizeFolderName(el.folderName.value) || sanitizeFolderName(state.folderName);
+    var accessCode = el.accessCode.value.trim();
+
+    if (!studentUrl) {
+      showToast('Enter the hosted student page URL.');
+      return;
+    }
+    if (!state.folderId) {
+      showToast('Connect your Drive folder first (step 1).');
+      return;
+    }
+    var inputId = extractFolderId(el.driveFolderInput.value);
+    if (inputId && inputId !== state.folderId) {
+      showToast('Click "Connect folder" to apply the new folder link.');
+      return;
+    }
+    if (!displayName) {
+      displayName = 'Uploads';
+    }
+    el.folderName.value = displayName;
+
+    var link = buildLink(studentUrl, displayName, accessCode, state.folderId);
+    if (!link) {
+      showToast('Use a full https:// address for the student page.');
+      return;
+    }
+
+    saveSettings();
+    state.link = link;
+    el.resultCard.hidden = false;
+    el.resultFolder.textContent = 'Destination folder: ' + displayName;
+    el.linkText.textContent = link;
+    renderQr(link);
+    el.resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function renderQr(link) {
@@ -392,163 +840,24 @@
     }
   }
 
-  function setConnectionStatus(message, kind) {
-    el.connectionStatus.textContent = message;
-    el.connectionStatus.className = 'connection-status ' + (kind || 'info');
-    el.connectionStatus.hidden = false;
-  }
-
-  function buildTestPdfBase64() {
-    if (!window.jspdf || !window.jspdf.jsPDF) {
-      throw new Error('PDF library did not load.');
-    }
-    var doc = new window.jspdf.jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    doc.setFontSize(18);
-    doc.text('Drive connection test', 20, 25);
-    doc.setFontSize(10);
-    doc.text('This file was created by the teacher page to verify the Drive connection.', 20, 35);
-    doc.text('You can delete it.', 20, 42);
-    var uri = doc.output('datauristring');
-    return uri.slice(uri.indexOf(',') + 1);
-  }
-
-  async function testDriveConnection() {
-    var url = el.appsScriptUrl.value.trim();
-    var folderName = sanitizeFolderName(el.folderName.value) || 'Exam_Uploads';
-    var accessCode = el.accessCode.value.trim();
-
-    if (!url) {
-      setConnectionStatus('Paste your Apps Script /exec URL first.', 'error');
-      return;
-    }
-    if (!/^https?:\/\//i.test(url)) {
-      setConnectionStatus('Use the full https:// Apps Script /exec URL.', 'error');
-      return;
-    }
-    if (url.indexOf('/dev') !== -1) {
-      setConnectionStatus('Use the /exec deployment URL, not the /dev URL.', 'error');
-      return;
-    }
-    if (!window.jspdf || !window.jspdf.jsPDF) {
-      setConnectionStatus('The PDF library did not load. Check your internet connection and reload the page.', 'error');
-      return;
-    }
-
-    saveSettings();
-    el.testDriveBtn.disabled = true;
-    setConnectionStatus('Testing... This creates a small PDF in the Drive folder.', 'info');
-
-    try {
-      var pdfBase64 = buildTestPdfBase64();
-      var response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: 'upload',
-          name: 'Connection Test',
-          folder: folderName,
-          k: accessCode,
-          mimeType: 'application/pdf',
-          fileBase64: pdfBase64
-        }),
-        redirect: 'follow'
-      });
-
-      var text = await response.text();
-      var data;
-      try {
-        data = JSON.parse(text);
-      } catch (parseErr) {
-        console.error('Non-JSON response from Apps Script:', text.slice(0, 300));
-        setConnectionStatus('The Apps Script URL returned HTML instead of JSON. This usually means the deployment is not public. Set Execute as: Me and Who has access: Anyone, deploy a new version, and use the /exec URL.', 'error');
-        return;
-      }
-
-      if (data && data.ok === true) {
-        var savedName = data.data && data.data.fileName ? data.data.fileName : 'the test PDF';
-        var savedFolder = data.data && data.data.folderName ? data.data.folderName : folderName;
-        setConnectionStatus('Drive connected. A test PDF was saved as "' + savedName + '" in the folder "' + savedFolder + '". You can delete it from Drive.', 'success');
-      } else {
-        var code = data && data.errorCode ? data.errorCode : 'ERROR';
-        var message = data && data.message ? data.message : 'Unknown error';
-        var hint = code === 'INVALID_ACCESS'
-          ? ' Check the access code, and make sure the current Code.gs is deployed as a new version.'
-          : '';
-        console.error('Drive connection test failed:', code, message);
-        setConnectionStatus('Drive connection failed: ' + code + ' — ' + message + hint, 'error');
-      }
-    } catch (err) {
-      console.error('Drive connection test error:', err);
-      setConnectionStatus('Could not reach the Apps Script URL. Check that it is the /exec URL, the deployment is public (Anyone), and allow CORS/network access. ' + (err && err.message ? '(' + err.message + ')' : ''), 'error');
-    } finally {
-      el.testDriveBtn.disabled = false;
-    }
-  }
-
-  function generate() {
-    var studentUrl = el.studentUrl.value.trim();
-    var folderName = sanitizeFolderName(el.folderName.value);
-    var accessCode = el.accessCode.value.trim();
-
-    if (!studentUrl) {
-      showToast('Enter the hosted student page URL.');
-      return;
-    }
-    if (!folderName) {
-      showToast('Enter a Drive folder name.');
-      return;
-    }
-    el.folderName.value = folderName;
-
-    var link = buildLink(studentUrl, folderName, accessCode);
-    if (!link) {
-      showToast('Use a full https:// address for the student page.');
-      return;
-    }
-
-    saveSettings();
-    state.link = link;
-    state.folder = folderName;
-
-    el.resultCard.hidden = false;
-    el.resultFolder.textContent = 'Destination folder: ' + folderName;
-    el.linkText.textContent = link;
-    renderQr(link);
-    el.resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
   async function copyLink() {
-    if (!state.link) { return; }
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(state.link);
-        showToast('Link copied.');
-        return;
-      }
-    } catch (err) {}
-    try {
-      var area = document.createElement('textarea');
-      area.value = state.link;
-      area.style.position = 'fixed';
-      area.style.opacity = '0';
-      document.body.appendChild(area);
-      area.focus();
-      area.select();
-      document.execCommand('copy');
-      document.body.removeChild(area);
-      showToast('Link copied.');
-    } catch (err) {
-      showToast('Copy failed. Please copy the link manually.');
+    if (!state.link) {
+      return;
     }
+    await copyText(state.link, 'Link copied.');
   }
 
   function openPage() {
-    if (!state.link) { return; }
+    if (!state.link) {
+      return;
+    }
     window.open(state.link, '_blank', 'noopener');
   }
 
   function printQr() {
-    if (!state.link) { return; }
+    if (!state.link) {
+      return;
+    }
     captureQr();
     if (!state.qrDataUrl) {
       showToast('QR code is not ready yet. Try again in a moment.');
@@ -559,7 +868,7 @@
       showToast('Allow pop-ups to print the QR code.');
       return;
     }
-    var title = escapeHtml('Upload to ' + state.folder);
+    var title = escapeHtml('Upload to ' + (state.folderName || 'the teacher folder'));
     var safeLink = escapeHtml(state.link);
     win.document.write('<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>QR code</title>' +
       '<style>body{font-family:Arial,Helvetica,sans-serif;text-align:center;padding:40px;color:#202124}' +
@@ -575,13 +884,38 @@
     }, 400);
   }
 
+  function copyOwnerEmail() {
+    if (!state.ownerEmail) {
+      showToast('The sharing email is not loaded yet.');
+      return;
+    }
+    copyText(state.ownerEmail, 'Email copied.');
+  }
+
+  el.connectFolderBtn.addEventListener('click', connectFolder);
   el.testDriveBtn.addEventListener('click', testDriveConnection);
   el.generateBtn.addEventListener('click', generate);
+  el.copyOwnerEmailBtn.addEventListener('click', copyOwnerEmail);
   el.copyBtn.addEventListener('click', copyLink);
   el.openBtn.addEventListener('click', openPage);
   el.printBtn.addEventListener('click', printQr);
 
-  loadSettings();
+  el.appsScriptUrl.addEventListener('change', function () {
+    state.ownerEmail = '';
+    setOwnerEmail('Loading…');
+    saveSettings();
+    loadBackendInfo();
+  });
+
+  async function init() {
+    loadSettings();
+    if (!el.appsScriptUrl.value.trim()) {
+      await discoverAppsScriptUrl();
+    }
+    await loadBackendInfo();
+  }
+
+  init();
 })();
 </script>
 </body>

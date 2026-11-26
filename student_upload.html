@@ -436,10 +436,11 @@
 
   const FORCE_DEMO = new URLSearchParams(window.location.search).get('demo') === '1';
   const IS_LOCAL_HOST = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  const API_URL = (String(APPS_SCRIPT_URL).indexOf('YOUR_') === 0 && (IS_LOCAL_HOST || FORCE_DEMO)) ? '/exec' : 'https://script.google.com/macros/s/***/exec';
+  const API_URL = (String(APPS_SCRIPT_URL).indexOf('YOUR_') === 0 && (IS_LOCAL_HOST || FORCE_DEMO)) ? '/exec' : 'https://script.google.com/macros/s/AKfycbwRDidb42eK8DW4zMd6V4NZMl3W2Pe5tdod02RzxdIn4JgD28DqpwZMxafXM_sk9GY6/exec';
 
   const params = new URLSearchParams(window.location.search);
   const FOLDER = (params.get('folder') || '').trim();
+  const FOLDER_ID = (params.get('folderId') || params.get('fid') || '').trim();
   const CODE = (params.get('k') || '').trim();
   const DEBUG = params.get('debug') === '1';
 
@@ -448,6 +449,9 @@
     MISSING_NAME: 'כתבו את השם שלכם',
     FILE_TOO_LARGE: 'הקובץ גדול מדי – נסו לצלם פחות דפים',
     INVALID_FILE_TYPE: 'הקובץ לא נתמך – נסו לצלם שוב',
+    INVALID_FOLDER: 'התיקייה של המורה לא זמינה – בקשו מהמורה לבדוק את החיבור',
+    FOLDER_NOT_FOUND: 'התיקייה של המורה לא זמינה – בקשו מהמורה לבדוק את החיבור',
+    FOLDER_ACCESS: 'התיקייה של המורה לא זמינה – בקשו מהמורה לבדוק את החיבור',
     SERVER_BUSY: 'השרת עסוק כרגע – נסו שוב בעוד רגע',
     SERVER_ERROR: 'ההעלאה נכשלה – בקשו מהמורה לבדוק את הגדרות הדרייב',
     NETWORK: 'משהו השתבש בשליחה – בדקו את האינטרנט ונסו שוב',
@@ -790,6 +794,7 @@
         action: 'upload',
         name: name,
         folder: FOLDER,
+        folderId: FOLDER_ID,
         k: CODE,
         mimeType: 'application/pdf',
         fileBase64: pdfBase64
