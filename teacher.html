@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   :root {
     --blue: #0b57d0;
@@ -157,6 +158,19 @@
   }
   .note strong { color: var(--ink); }
 
+  .connection-status {
+    margin: 14px 0 0;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    line-height: 1.55;
+    word-break: break-word;
+  }
+  .connection-status.info { background: #f8fafc; color: var(--muted); border: 1px solid var(--line); }
+  .connection-status.success { background: #e6f4ea; color: #137333; border: 1px solid #b7e1c1; }
+  .connection-status.error { background: #fce8e6; color: #a50e0e; border: 1px solid #f6c7c3; }
+
   .toast {
     position: fixed;
     left: 50%;
@@ -209,6 +223,17 @@
     <button id="generateBtn" type="button" class="btn primary">Create link and QR code</button>
   </div>
 
+  <div class="card">
+    <h2>Check Drive connection</h2>
+    <p class="muted">Optional. Verifies that your Apps Script can create a PDF in the Drive folder. This creates a small test file named "Connection Test".</p>
+    <label>Apps Script /exec URL
+      <input id="appsScriptUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
+      <span class="hint">The same /exec URL you placed inside student_upload.html. It is not shown to students.</span>
+    </label>
+    <button id="testDriveBtn" type="button" class="btn">Test Drive connection</button>
+    <p id="connectionStatus" class="connection-status" hidden></p>
+  </div>
+
   <div id="resultCard" class="card result" hidden>
     <h2>Ready to share</h2>
     <p id="resultFolder" class="folder-label"></p>
@@ -221,7 +246,7 @@
     </div>
   </div>
 
-  <p class="note"><strong>This page does not connect to Google Drive.</strong> It only creates the student link and QR code. The folder is created automatically on the first student upload; open <strong>drive.google.com</strong> with the teacher account to see the PDFs. Keep the link private if you use an access code.</p>
+  <p class="note"><strong>Generating the link does not need Google Drive access.</strong> Use <strong>Check Drive connection</strong> above to verify your Apps Script can write to Drive. The folder is created automatically on the first successful upload or test; open <strong>drive.google.com</strong> with the teacher account to see the PDFs. Keep the link private if you use an access code.</p>
 </div>
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -242,6 +267,9 @@
     studentUrl: document.getElementById('studentUrl'),
     folderName: document.getElementById('folderName'),
     accessCode: document.getElementById('accessCode'),
+    appsScriptUrl: document.getElementById('appsScriptUrl'),
+    testDriveBtn: document.getElementById('testDriveBtn'),
+    connectionStatus: document.getElementById('connectionStatus'),
     generateBtn: document.getElementById('generateBtn'),
     resultCard: document.getElementById('resultCard'),
     resultFolder: document.getElementById('resultFolder'),
@@ -290,16 +318,27 @@
     el.studentUrl.value = settings.studentUrl || defaultStudentUrl();
     el.folderName.value = settings.folderName || 'Exam_Uploads';
     el.accessCode.value = settings.accessCode || '';
+    el.appsScriptUrl.value = settings.appsScriptUrl || '';
   }
 
-  function saveSettings(studentUrl, folderName, accessCode) {
+  function saveSettings() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        studentUrl: studentUrl,
-        folderName: folderName,
-        accessCode: accessCode
+        studentUrl: el.studentUrl.value.trim(),
+        folderName: el.folderName.value.trim(),
+        accessCode: el.accessCode.value.trim(),
+        appsScriptUrl: el.appsScriptUrl.value.trim()
       }));
     } catch (err) {}
+  }
+
+  function sanitizeFolderName(value) {
+    return String(value || '')
+      .replace(/[^A-Za-z\u0590-\u05FF0-9 _\-]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 60)
+      .trim();
   }
 
   function buildLink(studentUrl, folderName, accessCode) {
@@ -353,14 +392,102 @@
     }
   }
 
+  function setConnectionStatus(message, kind) {
+    el.connectionStatus.textContent = message;
+    el.connectionStatus.className = 'connection-status ' + (kind || 'info');
+    el.connectionStatus.hidden = false;
+  }
+
+  function buildTestPdfBase64() {
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      throw new Error('PDF library did not load.');
+    }
+    var doc = new window.jspdf.jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    doc.setFontSize(18);
+    doc.text('Drive connection test', 20, 25);
+    doc.setFontSize(10);
+    doc.text('This file was created by the teacher page to verify the Drive connection.', 20, 35);
+    doc.text('You can delete it.', 20, 42);
+    var uri = doc.output('datauristring');
+    return uri.slice(uri.indexOf(',') + 1);
+  }
+
+  async function testDriveConnection() {
+    var url = el.appsScriptUrl.value.trim();
+    var folderName = sanitizeFolderName(el.folderName.value) || 'Exam_Uploads';
+    var accessCode = el.accessCode.value.trim();
+
+    if (!url) {
+      setConnectionStatus('Paste your Apps Script /exec URL first.', 'error');
+      return;
+    }
+    if (!/^https?:\/\//i.test(url)) {
+      setConnectionStatus('Use the full https:// Apps Script /exec URL.', 'error');
+      return;
+    }
+    if (url.indexOf('/dev') !== -1) {
+      setConnectionStatus('Use the /exec deployment URL, not the /dev URL.', 'error');
+      return;
+    }
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      setConnectionStatus('The PDF library did not load. Check your internet connection and reload the page.', 'error');
+      return;
+    }
+
+    saveSettings();
+    el.testDriveBtn.disabled = true;
+    setConnectionStatus('Testing... This creates a small PDF in the Drive folder.', 'info');
+
+    try {
+      var pdfBase64 = buildTestPdfBase64();
+      var response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: 'upload',
+          name: 'Connection Test',
+          folder: folderName,
+          k: accessCode,
+          mimeType: 'application/pdf',
+          fileBase64: pdfBase64
+        }),
+        redirect: 'follow'
+      });
+
+      var text = await response.text();
+      var data;
+      try {
+        data = JSON.parse(text);
+      } catch (parseErr) {
+        console.error('Non-JSON response from Apps Script:', text.slice(0, 300));
+        setConnectionStatus('The Apps Script URL returned HTML instead of JSON. This usually means the deployment is not public. Set Execute as: Me and Who has access: Anyone, deploy a new version, and use the /exec URL.', 'error');
+        return;
+      }
+
+      if (data && data.ok === true) {
+        var savedName = data.data && data.data.fileName ? data.data.fileName : 'the test PDF';
+        var savedFolder = data.data && data.data.folderName ? data.data.folderName : folderName;
+        setConnectionStatus('Drive connected. A test PDF was saved as "' + savedName + '" in the folder "' + savedFolder + '". You can delete it from Drive.', 'success');
+      } else {
+        var code = data && data.errorCode ? data.errorCode : 'ERROR';
+        var message = data && data.message ? data.message : 'Unknown error';
+        var hint = code === 'INVALID_ACCESS'
+          ? ' Check the access code, and make sure the current Code.gs is deployed as a new version.'
+          : '';
+        console.error('Drive connection test failed:', code, message);
+        setConnectionStatus('Drive connection failed: ' + code + ' — ' + message + hint, 'error');
+      }
+    } catch (err) {
+      console.error('Drive connection test error:', err);
+      setConnectionStatus('Could not reach the Apps Script URL. Check that it is the /exec URL, the deployment is public (Anyone), and allow CORS/network access. ' + (err && err.message ? '(' + err.message + ')' : ''), 'error');
+    } finally {
+      el.testDriveBtn.disabled = false;
+    }
+  }
+
   function generate() {
     var studentUrl = el.studentUrl.value.trim();
-    var folderName = el.folderName.value
-      .replace(/[^A-Za-z\u0590-\u05FF0-9 _\-]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .slice(0, 60)
-      .trim();
+    var folderName = sanitizeFolderName(el.folderName.value);
     var accessCode = el.accessCode.value.trim();
 
     if (!studentUrl) {
@@ -379,7 +506,7 @@
       return;
     }
 
-    saveSettings(studentUrl, folderName, accessCode);
+    saveSettings();
     state.link = link;
     state.folder = folderName;
 
@@ -448,6 +575,7 @@
     }, 400);
   }
 
+  el.testDriveBtn.addEventListener('click', testDriveConnection);
   el.generateBtn.addEventListener('click', generate);
   el.copyBtn.addEventListener('click', copyLink);
   el.openBtn.addEventListener('click', openPage);
