@@ -11,6 +11,7 @@
 <style>
   :root {
     --blue: #0b57d0;
+    --blue-dark: #0842a0;
     --blue-soft: #e8f0fe;
     --ink: #202124;
     --muted: #5f6368;
@@ -136,6 +137,9 @@
   .btn:active { transform: scale(0.98); }
   .btn:disabled { opacity: 0.55; cursor: default; transform: none; }
   .btn.small { font-size: 0.78rem; padding: 7px 11px; min-height: 34px; border-radius: 8px; }
+  a.btn { text-decoration: none; }
+  .btn.upgrade { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .btn.upgrade:hover { background: var(--blue-dark); }
 
   .status {
     margin: 13px 0 0;
@@ -182,6 +186,23 @@
   }
   .link-text:hover { text-decoration: underline; }
   .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+
+  .upgrade-box {
+    margin: 14px 0 0;
+    padding: 14px;
+    border-radius: 12px;
+    background: #fff8e1;
+    border: 1px solid #f7d774;
+    color: #6b4e00;
+    font-size: 0.84rem;
+    line-height: 1.5;
+  }
+  .upgrade-box p { margin: 0 0 8px; }
+  .upgrade-box .actions { justify-content: flex-start; }
+  .upgrade-hint { font-size: 0.76rem; color: #7a5c00; }
+  .pricing { margin: 14px 0 0; font-size: 0.78rem; color: var(--muted); text-align: center; }
+  .pricing a { color: var(--blue); font-weight: 600; text-decoration: none; }
+  .pricing a:hover { text-decoration: underline; }
 
   .note {
     margin: 0;
@@ -247,6 +268,17 @@
     </label>
 
     <p id="connectStatus" class="status" hidden></p>
+
+    <div id="upgradeBox" class="upgrade-box" hidden>
+      <p id="upgradeMessage"></p>
+      <p id="upgradeHint" class="upgrade-hint" hidden>Pay with Bit using the same email as your Google Drive account. Then contact the app owner to activate Pro. Pro ends on the due date if not renewed.</p>
+      <div class="actions">
+        <a id="upgradeBtn" class="btn upgrade" target="_blank" rel="noopener" hidden>Pay ₪300 with Bit</a>
+        <button id="retryUpgradeBtn" class="btn" type="button" hidden>I paid — retry</button>
+      </div>
+    </div>
+
+    <p class="pricing">Free plan: up to <span id="freeLimit">5</span> folders. <a id="pricingLink" href="#" target="_blank" rel="noopener" hidden>Need more? ₪300/year via Bit</a></p>
   </div>
 
   <div id="resultCard" class="card result" hidden>
@@ -271,6 +303,7 @@
 
   var STORAGE_KEY = 'teacherUploadSetupV3';
   var LEGACY_KEYS = ['teacherUploadSetupV2', 'uploadLinkSettingsV1'];
+  var PAYMENT_URL = 'https://www.bitpay.co.il/app/me/CE1C6293-D840-DA02-192A-2C5FF3EE80488B51';
 
   var state = {
     link: '',
@@ -288,6 +321,13 @@
     shareBox: document.getElementById('shareBox'),
     driveFolderInput: document.getElementById('driveFolderInput'),
     connectStatus: document.getElementById('connectStatus'),
+    upgradeBox: document.getElementById('upgradeBox'),
+    upgradeMessage: document.getElementById('upgradeMessage'),
+    upgradeHint: document.getElementById('upgradeHint'),
+    upgradeBtn: document.getElementById('upgradeBtn'),
+    retryUpgradeBtn: document.getElementById('retryUpgradeBtn'),
+    freeLimit: document.getElementById('freeLimit'),
+    pricingLink: document.getElementById('pricingLink'),
     resultCard: document.getElementById('resultCard'),
     resultFolder: document.getElementById('resultFolder'),
     qrBox: document.getElementById('qrBox'),
@@ -425,6 +465,47 @@
     el.shareBox.hidden = ownerMatches === true;
   }
 
+  function paymentConfigured() {
+    var url = String(PAYMENT_URL || '');
+    return url && url.indexOf('YOUR_') === -1;
+  }
+
+  function applyPaymentLinks() {
+    if (paymentConfigured()) {
+      el.pricingLink.href = PAYMENT_URL;
+      el.pricingLink.hidden = false;
+    } else {
+      el.pricingLink.hidden = true;
+    }
+  }
+
+  function updateUpgradeHint() {
+    var contact = state.ownerEmail || 'the app owner';
+    el.upgradeHint.textContent = 'Pay with Bit using the same email as your Google Drive account. Then contact ' + contact + ' to activate Pro. Pro ends on the due date if not renewed.';
+  }
+
+  function showUpgrade(message) {
+    var hasPayment = paymentConfigured();
+    el.upgradeMessage.textContent = message + (hasPayment ? '' : ' Contact the app owner to activate Pro.');
+    el.upgradeHint.hidden = !hasPayment;
+    if (hasPayment) {
+      el.upgradeBtn.href = PAYMENT_URL;
+      el.upgradeBtn.hidden = false;
+      el.retryUpgradeBtn.hidden = false;
+    } else {
+      el.upgradeBtn.hidden = true;
+      el.retryUpgradeBtn.hidden = true;
+    }
+    el.upgradeBox.hidden = false;
+    el.resultCard.hidden = true;
+    el.connectStatus.hidden = true;
+    el.shareBox.hidden = true;
+  }
+
+  function hideUpgrade() {
+    el.upgradeBox.hidden = true;
+  }
+
   async function discoverAppsScriptUrl() {
     if (state.appsUrl) {
       return;
@@ -485,6 +566,11 @@
 
       state.ownerEmail = data.ownerEmail || '';
       setOwnerEmail(state.ownerEmail || '—');
+      if (data.freeFolderLimit) {
+        el.freeLimit.textContent = String(data.freeFolderLimit);
+      }
+      applyPaymentLinks();
+      updateUpgradeHint();
 
       if (!state.ownerEmail) {
         setConnectStatus('The backend did not return a sharing email. Deploy the new Code.gs as a new version.', 'error');
@@ -511,7 +597,7 @@
     } else if (code === 'INVALID_FOLDER') {
       hint = ' Paste a valid Google Drive folder link or ID.';
     } else if (code === 'INVALID_ACCESS') {
-      hint = ' Leave UPLOAD_CODE empty in Code.gs, or contact the app owner.';
+      hint = ' Make sure the latest Code.gs is deployed, or contact the app owner.';
     }
     return 'Could not link the folder: ' + code + ' — ' + message + hint;
   }
@@ -523,6 +609,7 @@
       state.folderId = '';
       state.folderName = '';
       state.ownerMatches = null;
+      hideUpgrade();
       el.resultCard.hidden = true;
       el.connectStatus.hidden = true;
       applyShareVisibility(null);
@@ -532,6 +619,7 @@
       state.folderId = folderId;
       state.folderName = '';
       state.ownerMatches = null;
+      hideUpgrade();
       applyShareVisibility(null);
       renderResult(false);
       setConnectStatus('Linking folder...', 'info');
@@ -554,6 +642,7 @@
     }
 
     var checkId = state.folderId;
+    hideUpgrade();
     setConnectStatus('Linking folder...', 'info');
 
     try {
@@ -582,6 +671,7 @@
         state.folderName = info.folderName || '';
         state.ownerMatches = info.ownerMatches === true;
         saveSettings();
+        hideUpgrade();
         applyShareVisibility(state.ownerMatches);
         if (state.ownerMatches) {
           setConnectStatus('Ready. This folder is in the app\'s Google account, so no sharing is needed. Your student link is below.', 'success');
@@ -589,12 +679,16 @@
           setConnectStatus('Ready. Keep this folder shared with ' + (state.ownerEmail || 'the app email') + ' as Editor. Your student link is below.', 'success');
         }
         renderResult(false);
+      } else if (data && data.errorCode === 'UPGRADE_REQUIRED') {
+        showUpgrade(data.message || 'You reached the free plan limit. Pro is ₪300/year to add more folders.');
       } else {
+        hideUpgrade();
         applyShareVisibility(false);
         setConnectStatus(folderErrorText(data), 'error');
       }
     } catch (err) {
       console.error('Link folder error:', err);
+      hideUpgrade();
       applyShareVisibility(false);
       setConnectStatus('Could not reach the backend. Check the /exec URL and that the deployment is public (Anyone).', 'error');
     }
@@ -718,6 +812,10 @@
   el.copyOwnerEmailBtn.addEventListener('click', copyOwnerEmail);
   el.copyBtn.addEventListener('click', copyLink);
   el.printBtn.addEventListener('click', printQr);
+  el.retryUpgradeBtn.addEventListener('click', function () {
+    hideUpgrade();
+    checkFolder();
+  });
   el.driveFolderInput.addEventListener('input', onFolderInput);
   el.driveFolderInput.addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
@@ -728,6 +826,7 @@
   });
 
   async function init() {
+    applyPaymentLinks();
     loadSettings();
     if (!state.appsUrl) {
       await discoverAppsScriptUrl();
