@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Student Upload Link - Teacher Setup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --blue: #0b57d0;
+    --blue-dark: #0842a0;
+    --blue-soft: #e8f0fe;
+    --ink: #202124;
+    --muted: #5f6368;
+    --line: #e3e7ee;
+    --bg: #f5f7fb;
+    --green: #188038;
+    --radius: 20px;
+    --shadow: 0 14px 36px rgba(32, 33, 36, 0.09);
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    background: radial-gradient(circle at 10% 0%, #e8f0fe 0%, transparent 42%),
+                radial-gradient(circle at 95% 8%, #fce8e6 0%, transparent 38%),
+                var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 760px; margin: 0 auto; padding: 32px 20px 64px; }
+
+  header { text-align: center; margin-bottom: 24px; }
+  .logo {
+    width: 62px;
+    height: 62px;
+    margin: 0 auto 12px;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.9rem;
+  }
+  header h1 { margin: 0 0 8px; font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; }
+  header p { margin: 0 auto; max-width: 520px; color: var(--muted); font-size: 0.95rem; line-height: 1.55; }
+
+  .card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .card h2 { margin: 0 0 16px; font-size: 1.05rem; font-weight: 800; }
+
+  label { display: block; font-size: 0.83rem; font-weight: 600; color: #3c4043; margin-bottom: 14px; }
+  .hint { display: block; margin-top: 6px; font-size: 0.77rem; font-weight: 400; color: var(--muted); line-height: 1.45; }
+
+  input[type="url"], input[type="text"] {
+    width: 100%;
+    height: 46px;
+    margin-top: 6px;
+    padding: 0 13px;
+    border: 1px solid #d5dbe5;
+    border-radius: 11px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    color: var(--ink);
+    background: #fbfcfe;
+  }
+  input:focus {
+    outline: none;
+    border-color: var(--blue);
+    background: #fff;
+    box-shadow: 0 0 0 3px var(--blue-soft);
+  }
+
+  .btn {
+    appearance: none;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    min-height: 44px;
+    padding: 0 18px;
+    border-radius: 11px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.12s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .btn:hover { background: #f8fafc; }
+  .btn:active { transform: scale(0.98); }
+  .btn.primary {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: #fff;
+    width: 100%;
+    min-height: 50px;
+    font-size: 0.97rem;
+    box-shadow: 0 10px 22px rgba(11, 87, 208, 0.25);
+  }
+  .btn.primary:hover { background: var(--blue-dark); }
+  .btn.ghost { color: var(--blue); border-color: #c6dafc; }
+
+  .result { text-align: center; }
+  .result h2 { margin-bottom: 4px; }
+  .result .folder-label { margin: 0 0 16px; color: var(--muted); font-size: 0.88rem; }
+  .qr-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    max-width: 300px;
+    margin: 0 auto 16px;
+    border: 1px dashed #c6dafc;
+    border-radius: 16px;
+    background: #fbfcfe;
+    min-height: 280px;
+  }
+  .qr-box canvas, .qr-box img { display: block; }
+  .link-text {
+    text-align: left;
+    font-size: 0.8rem;
+    color: var(--muted);
+    word-break: break-all;
+    background: #f8fafc;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    padding: 12px 14px;
+    margin: 0 0 16px;
+    line-height: 1.5;
+  }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+
+  .note {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.6;
+    text-align: center;
+  }
+  .note strong { color: var(--ink); }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translate(-50%, 20px);
+    background: #202124;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 12px 18px;
+    border-radius: 12px;
+    max-width: calc(100vw - 40px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease, transform 0.22s ease;
+    z-index: 50;
+    text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 520px) {
+    .wrap { padding: 24px 14px 48px; }
+    header h1 { font-size: 1.35rem; }
+    .card { padding: 20px 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">🔗</div>
+    <h1>Student Upload Link</h1>
+    <p>Create one link or QR code. Students open it, enter their name, photograph their pages, and the PDF lands in your Google Drive. No accounts, no class lists.</p>
+  </header>
+
+  <div class="card">
+    <h2>Link settings</h2>
+    <label>Student page URL
+      <input id="studentUrl" type="url" placeholder="https://yoursite.com/student_upload.html" autocomplete="off">
+      <span class="hint">The address where you hosted <strong>student_upload.html</strong>.</span>
+    </label>
+    <label>Drive folder name
+      <input id="folderName" type="text" placeholder="Exam_Uploads" maxlength="60" autocomplete="off">
+      <span class="hint">Created automatically inside your Drive if it does not exist.</span>
+    </label>
+    <label>Access code (optional)
+      <input id="accessCode" type="text" placeholder="Leave blank to use no code" maxlength="80" autocomplete="off">
+      <span class="hint">If you set <strong>UPLOAD_CODE</strong> in Code.gs, enter the exact same value here.</span>
+    </label>
+    <button id="generateBtn" type="button" class="btn primary">Create link and QR code</button>
+  </div>
+
+  <div id="resultCard" class="card result" hidden>
+    <h2>Ready to share</h2>
+    <p id="resultFolder" class="folder-label"></p>
+    <div id="qrBox" class="qr-box"></div>
+    <p id="linkText" class="link-text"></p>
+    <div class="actions">
+      <button id="copyBtn" type="button" class="btn">Copy link</button>
+      <button id="openBtn" type="button" class="btn ghost">Open student page</button>
+      <button id="printBtn" type="button" class="btn">Print QR</button>
+    </div>
+  </div>
+
+  <p class="note">Students do not sign in. Files are written by your Apps Script deployment into the folder named above. Keep the link private if you use an access code.</p>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var STORAGE_KEY = 'uploadLinkSettingsV1';
+
+  var state = {
+    link: '',
+    folder: '',
+    qrDataUrl: ''
+  };
+
+  var el = {
+    studentUrl: document.getElementById('studentUrl'),
+    folderName: document.getElementById('folderName'),
+    accessCode: document.getElementById('accessCode'),
+    generateBtn: document.getElementById('generateBtn'),
+    resultCard: document.getElementById('resultCard'),
+    resultFolder: document.getElementById('resultFolder'),
+    qrBox: document.getElementById('qrBox'),
+    linkText: document.getElementById('linkText'),
+    copyBtn: document.getElementById('copyBtn'),
+    openBtn: document.getElementById('openBtn'),
+    printBtn: document.getElementById('printBtn'),
+    toast: document.getElementById('toast')
+  };
+
+  function defaultStudentUrl() {
+    try {
+      return new URL('student_upload.html', window.location.href).href;
+    } catch (err) {
+      return 'student_upload.html';
+    }
+  }
+
+  function showToast(message) {
+    el.toast.textContent = message;
+    el.toast.classList.add('show');
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(function () {
+      el.toast.classList.remove('show');
+    }, 4000);
+  }
+
+  function escapeHtml(value) {
+    return String(value === null || value === undefined ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function loadSettings() {
+    var saved = null;
+    try {
+      saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+    } catch (err) {
+      saved = null;
+    }
+    var settings = saved || {};
+    el.studentUrl.value = settings.studentUrl || defaultStudentUrl();
+    el.folderName.value = settings.folderName || 'Exam_Uploads';
+    el.accessCode.value = settings.accessCode || '';
+  }
+
+  function saveSettings(studentUrl, folderName, accessCode) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        studentUrl: studentUrl,
+        folderName: folderName,
+        accessCode: accessCode
+      }));
+    } catch (err) {}
+  }
+
+  function buildLink(studentUrl, folderName, accessCode) {
+    var url;
+    try {
+      url = new URL(studentUrl, window.location.href);
+    } catch (err) {
+      return '';
+    }
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+      return '';
+    }
+    url.searchParams.set('folder', folderName);
+    if (accessCode) {
+      url.searchParams.set('k', accessCode);
+    } else {
+      url.searchParams.delete('k');
+    }
+    return url.toString();
+  }
+
+  function renderQr(link) {
+    el.qrBox.innerHTML = '';
+    state.qrDataUrl = '';
+    if (!window.QRCode) {
+      el.qrBox.textContent = 'QR library did not load. Copy the link instead.';
+      return;
+    }
+    new QRCode(el.qrBox, {
+      text: link,
+      width: 240,
+      height: 240,
+      correctLevel: QRCode.CorrectLevel.M,
+      colorDark: '#202124',
+      colorLight: '#ffffff'
+    });
+    setTimeout(captureQr, 30);
+  }
+
+  function captureQr() {
+    var canvas = el.qrBox.querySelector('canvas');
+    var image = el.qrBox.querySelector('img');
+    if (canvas) {
+      try {
+        state.qrDataUrl = canvas.toDataURL('image/png');
+        return;
+      } catch (err) {}
+    }
+    if (image && image.src) {
+      state.qrDataUrl = image.src;
+    }
+  }
+
+  function generate() {
+    var studentUrl = el.studentUrl.value.trim();
+    var folderName = el.folderName.value
+      .replace(/[^A-Za-z\u0590-\u05FF0-9 _\-]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 60)
+      .trim();
+    var accessCode = el.accessCode.value.trim();
+
+    if (!studentUrl) {
+      showToast('Enter the hosted student page URL.');
+      return;
+    }
+    if (!folderName) {
+      showToast('Enter a Drive folder name.');
+      return;
+    }
+    el.folderName.value = folderName;
+
+    var link = buildLink(studentUrl, folderName, accessCode);
+    if (!link) {
+      showToast('Use a full https:// address for the student page.');
+      return;
+    }
+
+    saveSettings(studentUrl, folderName, accessCode);
+    state.link = link;
+    state.folder = folderName;
+
+    el.resultCard.hidden = false;
+    el.resultFolder.textContent = 'Destination folder: ' + folderName;
+    el.linkText.textContent = link;
+    renderQr(link);
+    el.resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  async function copyLink() {
+    if (!state.link) { return; }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(state.link);
+        showToast('Link copied.');
+        return;
+      }
+    } catch (err) {}
+    try {
+      var area = document.createElement('textarea');
+      area.value = state.link;
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.focus();
+      area.select();
+      document.execCommand('copy');
+      document.body.removeChild(area);
+      showToast('Link copied.');
+    } catch (err) {
+      showToast('Copy failed. Please copy the link manually.');
+    }
+  }
+
+  function openPage() {
+    if (!state.link) { return; }
+    window.open(state.link, '_blank', 'noopener');
+  }
+
+  function printQr() {
+    if (!state.link) { return; }
+    captureQr();
+    if (!state.qrDataUrl) {
+      showToast('QR code is not ready yet. Try again in a moment.');
+      return;
+    }
+    var win = window.open('', '_blank');
+    if (!win) {
+      showToast('Allow pop-ups to print the QR code.');
+      return;
+    }
+    var title = escapeHtml('Upload to ' + state.folder);
+    var safeLink = escapeHtml(state.link);
+    win.document.write('<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>QR code</title>' +
+      '<style>body{font-family:Arial,Helvetica,sans-serif;text-align:center;padding:40px;color:#202124}' +
+      'h1{font-size:22px;margin-bottom:6px}p{font-size:12px;color:#5f6368;word-break:break-all;max-width:520px;margin:14px auto}' +
+      'img{width:340px;height:340px;image-rendering:pixelated}</style></head><body>' +
+      '<h1>' + title + '</h1><img src="' + state.qrDataUrl + '" alt="QR code"><p>' + safeLink + '</p></body></html>');
+    win.document.close();
+    setTimeout(function () {
+      try {
+        win.focus();
+        win.print();
+      } catch (err) {}
+    }, 400);
+  }
+
+  el.generateBtn.addEventListener('click', generate);
+  el.copyBtn.addEventListener('click', copyLink);
+  el.openBtn.addEventListener('click', openPage);
+  el.printBtn.addEventListener('click', printQr);
+
+  loadSettings();
+})();
+</script>
+</body>
+</html>
