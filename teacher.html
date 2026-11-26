@@ -73,28 +73,6 @@
   .steps a { color: var(--blue); font-weight: 600; text-decoration: none; }
   .steps a:hover { text-decoration: underline; }
 
-  .share {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    flex-wrap: wrap;
-    background: #f8faff;
-    border: 1px solid #c6dafc;
-    border-radius: 12px;
-    padding: 13px 14px;
-    margin-bottom: 15px;
-  }
-  .share-label {
-    font-size: 0.68rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--muted);
-    font-weight: 700;
-    margin-bottom: 3px;
-  }
-  .share strong { font-size: 0.93rem; word-break: break-all; }
-
   label { display: block; font-size: 0.82rem; font-weight: 600; color: #3c4043; margin-bottom: 14px; }
 
   input[type="text"] {
@@ -136,7 +114,6 @@
   .btn:hover { background: #f8fafc; }
   .btn:active { transform: scale(0.98); }
   .btn:disabled { opacity: 0.55; cursor: default; transform: none; }
-  .btn.small { font-size: 0.78rem; padding: 7px 11px; min-height: 34px; border-radius: 8px; }
   a.btn { text-decoration: none; }
   .btn.upgrade { background: var(--blue); border-color: var(--blue); color: #fff; }
   .btn.upgrade:hover { background: var(--blue-dark); }
@@ -264,7 +241,7 @@
   <header>
     <div class="logo">📁</div>
     <h1>Connect Your Google Drive</h1>
-    <p>Paste a Drive folder link and get a student upload link. Share the folder once only if it belongs to a different Google account.</p>
+    <p>Paste a Drive folder link and get a student upload link. The app checks the folder automatically.</p>
   </header>
 
   <div class="card">
@@ -272,16 +249,8 @@
     <ol class="steps">
       <li>Create a folder in <a href="https://drive.google.com/drive/my-drive" target="_blank" rel="noopener">Google Drive</a>.</li>
       <li>Paste the folder link below.</li>
-      <li>If the app asks, share it with the email shown as <strong>Editor</strong>.</li>
+      <li>If the app asks, share the folder with the app account as <strong>Editor</strong>.</li>
     </ol>
-
-    <div id="shareBox" class="share">
-      <div>
-        <div class="share-label">If it is in a different Google account, share it with</div>
-        <strong id="ownerEmail">Loading…</strong>
-      </div>
-      <button id="copyOwnerEmailBtn" type="button" class="btn small" disabled>Copy</button>
-    </div>
 
     <label>Drive folder link or ID
       <input id="driveFolderInput" type="text" placeholder="https://drive.google.com/drive/folders/..." autocomplete="off">
@@ -314,7 +283,7 @@
     </div>
   </div>
 
-  <p class="note">Google Drive does not allow anonymous uploads. If the folder belongs to a different account, share it once with the app email as Editor. Folders in the app's own account need no sharing.</p>
+  <p class="note">Google Drive does not allow anonymous uploads. Folders in the app's own account need no sharing; for other accounts, the app will show a sharing reminder.</p>
 </div>
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -334,14 +303,10 @@
     folderId: '',
     folderName: '',
     ownerMatches: null,
-    ownerEmail: '',
     appsUrl: ''
   };
 
   var el = {
-    ownerEmail: document.getElementById('ownerEmail'),
-    copyOwnerEmailBtn: document.getElementById('copyOwnerEmailBtn'),
-    shareBox: document.getElementById('shareBox'),
     driveFolderInput: document.getElementById('driveFolderInput'),
     connectStatus: document.getElementById('connectStatus'),
     upgradeBox: document.getElementById('upgradeBox'),
@@ -430,12 +395,6 @@
     return '';
   }
 
-  function setOwnerEmail(value) {
-    el.ownerEmail.textContent = value;
-    var usable = value && value !== '—' && value !== 'Loading…';
-    el.copyOwnerEmailBtn.disabled = !usable;
-  }
-
   function setConnectStatus(message, kind) {
     el.connectStatus.textContent = message;
     el.connectStatus.className = 'status ' + (kind || 'info');
@@ -470,7 +429,6 @@
 
     if (state.folderId) {
       setConnectStatus('Saved folder: "' + (state.folderName || 'your folder') + '".', state.ownerMatches === true ? 'success' : 'info');
-      applyShareVisibility(state.ownerMatches);
       renderResult(false);
     }
   }
@@ -484,10 +442,6 @@
         ownerMatches: state.ownerMatches
       }));
     } catch (err) {}
-  }
-
-  function applyShareVisibility(ownerMatches) {
-    el.shareBox.hidden = ownerMatches === true;
   }
 
   function paymentConfigured() {
@@ -505,11 +459,10 @@
   }
 
   function updateUpgradeHint() {
-    var contact = state.ownerEmail || 'the app owner';
     var instruction = IS_MOBILE
       ? 'Tap the Pay button to open Bit on your phone.'
       : 'Scan the QR below with your phone.';
-    el.upgradeHint.textContent = 'Bit payment works only on a smartphone. ' + instruction + ' Use the same email as your Google Drive account. Then contact ' + contact + ' to activate Pro. Pro ends on the due date if not renewed.';
+    el.upgradeHint.textContent = 'Bit payment works only on a smartphone. ' + instruction + ' Use the same email as your Google Drive account. Then contact the app owner to activate Pro. Pro ends on the due date if not renewed.';
   }
 
   function renderPaymentQr() {
@@ -558,7 +511,6 @@
     el.upgradeBox.hidden = false;
     el.resultCard.hidden = true;
     el.connectStatus.hidden = true;
-    el.shareBox.hidden = true;
   }
 
   function hideUpgrade() {
@@ -600,12 +552,10 @@
       await discoverAppsScriptUrl();
     }
     if (!state.appsUrl) {
-      setOwnerEmail('—');
       setConnectStatus('Could not find the Apps Script URL. Open this page with ?exec=YOUR_EXEC_URL.', 'error');
       return;
     }
 
-    setOwnerEmail('Loading…');
     try {
       var response = await fetch(state.appsUrl, { method: 'GET', redirect: 'follow', cache: 'no-store' });
       var text = await response.text();
@@ -613,33 +563,26 @@
       try {
         data = JSON.parse(text);
       } catch (parseErr) {
-        setOwnerEmail('—');
         setConnectStatus('The backend is not public or the URL is wrong. Set Execute as: Me and Who has access: Anyone, then deploy a new version.', 'error');
         return;
       }
 
       if (!data || data.ok !== true) {
-        setOwnerEmail('—');
         setConnectStatus('The backend returned an unexpected response.', 'error');
         return;
       }
 
-      state.ownerEmail = data.ownerEmail || '';
-      setOwnerEmail(state.ownerEmail || '—');
       if (data.freeFolderLimit) {
         el.freeLimit.textContent = String(data.freeFolderLimit);
       }
       applyPaymentLinks();
       updateUpgradeHint();
 
-      if (!state.ownerEmail) {
-        setConnectStatus('The backend did not return a sharing email. Deploy the new Code.gs as a new version.', 'error');
-      } else if (!state.folderId) {
-        setConnectStatus('Paste your Drive folder link below. Sharing is only needed when the folder is in a different Google account.', 'info');
+      if (!state.folderId) {
+        setConnectStatus('Paste your Drive folder link below. The app will check it automatically.', 'info');
       }
     } catch (err) {
       console.error('Backend info error:', err);
-      setOwnerEmail('—');
       setConnectStatus('Could not reach the backend. Make sure the /exec URL is public (Anyone).', 'error');
     }
   }
@@ -649,9 +592,7 @@
     var message = data && data.message ? data.message : 'Unknown error';
     var hint = '';
     if (code === 'FOLDER_NOT_FOUND') {
-      hint = state.ownerEmail
-        ? ' Share the folder with ' + state.ownerEmail + ' as Editor.'
-        : ' Share the folder with the app email as Editor.';
+      hint = ' Share the folder with the app account as Editor.';
     } else if (code === 'FOLDER_ACCESS') {
       hint = ' Change the sharing permission to Editor (not Viewer).';
     } else if (code === 'INVALID_FOLDER') {
@@ -672,7 +613,6 @@
       hideUpgrade();
       el.resultCard.hidden = true;
       el.connectStatus.hidden = true;
-      applyShareVisibility(null);
       return;
     }
     if (folderId !== state.folderId) {
@@ -680,7 +620,6 @@
       state.folderName = '';
       state.ownerMatches = null;
       hideUpgrade();
-      applyShareVisibility(null);
       renderResult(false);
       setConnectStatus('Linking folder...', 'info');
     }
@@ -732,24 +671,21 @@
         state.ownerMatches = info.ownerMatches === true;
         saveSettings();
         hideUpgrade();
-        applyShareVisibility(state.ownerMatches);
         if (state.ownerMatches) {
           setConnectStatus('Ready. This folder is in the app\'s Google account, so no sharing is needed. Your student link is below.', 'success');
         } else {
-          setConnectStatus('Ready. Keep this folder shared with ' + (state.ownerEmail || 'the app email') + ' as Editor. Your student link is below.', 'success');
+          setConnectStatus('Ready. Keep this folder shared with the app account as Editor. Your student link is below.', 'success');
         }
         renderResult(false);
       } else if (data && data.errorCode === 'UPGRADE_REQUIRED') {
         showUpgrade(data.message || 'You reached the free plan limit. Pro is ₪300/year to add more folders.');
       } else {
         hideUpgrade();
-        applyShareVisibility(false);
         setConnectStatus(folderErrorText(data), 'error');
       }
     } catch (err) {
       console.error('Link folder error:', err);
       hideUpgrade();
-      applyShareVisibility(false);
       setConnectStatus('Could not reach the backend. Check the /exec URL and that the deployment is public (Anyone).', 'error');
     }
   }
@@ -861,15 +797,6 @@
     }, 400);
   }
 
-  function copyOwnerEmail() {
-    if (!state.ownerEmail) {
-      showToast('The sharing email is not loaded yet.');
-      return;
-    }
-    copyText(state.ownerEmail, 'Email copied.');
-  }
-
-  el.copyOwnerEmailBtn.addEventListener('click', copyOwnerEmail);
   el.copyBtn.addEventListener('click', copyLink);
   el.printBtn.addEventListener('click', printQr);
   el.retryUpgradeBtn.addEventListener('click', function () {
