@@ -436,7 +436,7 @@
 
   const FORCE_DEMO = new URLSearchParams(window.location.search).get('demo') === '1';
   const IS_LOCAL_HOST = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  const API_URL = (String(APPS_SCRIPT_URL).indexOf('YOUR_') === 0 && (IS_LOCAL_HOST || FORCE_DEMO)) ? '/exec' : 'https://script.google.com/macros/s/AKfycbwRDidb42eK8DW4zMd6V4NZMl3W2Pe5tdod02RzxdIn4JgD28DqpwZMxafXM_sk9GY6/exec';
+  const API_URL = (String(APPS_SCRIPT_URL).indexOf('YOUR_') === 0 && (IS_LOCAL_HOST || FORCE_DEMO)) ? '/exec' : 'https://script.google.com/macros/s/***/exec';
 
   const params = new URLSearchParams(window.location.search);
   const FOLDER = (params.get('folder') || '').trim();
