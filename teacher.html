@@ -200,6 +200,26 @@
   .upgrade-box p { margin: 0 0 8px; }
   .upgrade-box .actions { justify-content: flex-start; }
   .upgrade-hint { font-size: 0.76rem; color: #7a5c00; }
+  .payment-qr {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 192px;
+    margin: 0 auto 4px;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #e3e7ee;
+    border-radius: 10px;
+    min-height: 180px;
+  }
+  .payment-qr canvas, .payment-qr img { display: block; }
+  .payment-qr-caption {
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #7a5c00;
+    margin: 0 0 10px;
+  }
   .pricing { margin: 14px 0 0; font-size: 0.78rem; color: var(--muted); text-align: center; }
   .pricing a { color: var(--blue); font-weight: 600; text-decoration: none; }
   .pricing a:hover { text-decoration: underline; }
@@ -271,14 +291,16 @@
 
     <div id="upgradeBox" class="upgrade-box" hidden>
       <p id="upgradeMessage"></p>
-      <p id="upgradeHint" class="upgrade-hint" hidden>Pay with Bit using the same email as your Google Drive account. Then contact the app owner to activate Pro. Pro ends on the due date if not renewed.</p>
+      <p id="upgradeHint" class="upgrade-hint" hidden>Bit payment works only on a smartphone. Open the Bit link on your phone or scan the QR below. Use the same email as your Google Drive account. Then contact the app owner to activate Pro. Pro ends on the due date if not renewed.</p>
+      <div id="paymentQr" class="payment-qr" hidden></div>
+      <p id="paymentQrCaption" class="payment-qr-caption" hidden>Scan with your phone to pay</p>
       <div class="actions">
-        <a id="upgradeBtn" class="btn upgrade" target="_blank" rel="noopener" hidden>Pay ₪300 with Bit</a>
+        <a id="upgradeBtn" class="btn upgrade" target="_blank" rel="noopener" hidden title="Bit payment works on a smartphone">Pay ₪300 with Bit</a>
         <button id="retryUpgradeBtn" class="btn" type="button" hidden>I paid — retry</button>
       </div>
     </div>
 
-    <p class="pricing">Free plan: up to <span id="freeLimit">5</span> folders. <a id="pricingLink" href="#" target="_blank" rel="noopener" hidden>Need more? ₪300/year via Bit</a></p>
+    <p class="pricing">Free plan: up to <span id="freeLimit">5</span> folders. <a id="pricingLink" href="#" target="_blank" rel="noopener" hidden title="Bit payment works on a smartphone">Need more? ₪300/year via Bit (smartphone)</a></p>
   </div>
 
   <div id="resultCard" class="card result" hidden>
@@ -304,6 +326,7 @@
   var STORAGE_KEY = 'teacherUploadSetupV3';
   var LEGACY_KEYS = ['teacherUploadSetupV2', 'uploadLinkSettingsV1'];
   var PAYMENT_URL = 'https://www.bitpay.co.il/app/me/CE1C6293-D840-DA02-192A-2C5FF3EE80488B51';
+  var IS_MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
 
   var state = {
     link: '',
@@ -324,6 +347,8 @@
     upgradeBox: document.getElementById('upgradeBox'),
     upgradeMessage: document.getElementById('upgradeMessage'),
     upgradeHint: document.getElementById('upgradeHint'),
+    paymentQr: document.getElementById('paymentQr'),
+    paymentQrCaption: document.getElementById('paymentQrCaption'),
     upgradeBtn: document.getElementById('upgradeBtn'),
     retryUpgradeBtn: document.getElementById('retryUpgradeBtn'),
     freeLimit: document.getElementById('freeLimit'),
@@ -481,20 +506,54 @@
 
   function updateUpgradeHint() {
     var contact = state.ownerEmail || 'the app owner';
-    el.upgradeHint.textContent = 'Pay with Bit using the same email as your Google Drive account. Then contact ' + contact + ' to activate Pro. Pro ends on the due date if not renewed.';
+    var instruction = IS_MOBILE
+      ? 'Tap the Pay button to open Bit on your phone.'
+      : 'Scan the QR below with your phone.';
+    el.upgradeHint.textContent = 'Bit payment works only on a smartphone. ' + instruction + ' Use the same email as your Google Drive account. Then contact ' + contact + ' to activate Pro. Pro ends on the due date if not renewed.';
+  }
+
+  function renderPaymentQr() {
+    el.paymentQr.innerHTML = '';
+    el.paymentQr.hidden = false;
+    el.paymentQrCaption.hidden = false;
+    if (!window.QRCode) {
+      el.paymentQr.textContent = 'Open the Bit link on your phone.';
+      return;
+    }
+    new QRCode(el.paymentQr, {
+      text: PAYMENT_URL,
+      width: 160,
+      height: 160,
+      correctLevel: QRCode.CorrectLevel.M,
+      colorDark: '#202124',
+      colorLight: '#ffffff'
+    });
+  }
+
+  function clearPaymentQr() {
+    el.paymentQr.innerHTML = '';
+    el.paymentQr.hidden = true;
+    el.paymentQrCaption.hidden = true;
   }
 
   function showUpgrade(message) {
     var hasPayment = paymentConfigured();
+    updateUpgradeHint();
     el.upgradeMessage.textContent = message + (hasPayment ? '' : ' Contact the app owner to activate Pro.');
     el.upgradeHint.hidden = !hasPayment;
     if (hasPayment) {
       el.upgradeBtn.href = PAYMENT_URL;
-      el.upgradeBtn.hidden = false;
+      el.upgradeBtn.hidden = !IS_MOBILE;
       el.retryUpgradeBtn.hidden = false;
+      if (IS_MOBILE) {
+        clearPaymentQr();
+      } else {
+        renderPaymentQr();
+      }
     } else {
       el.upgradeBtn.hidden = true;
       el.retryUpgradeBtn.hidden = true;
+      clearPaymentQr();
     }
     el.upgradeBox.hidden = false;
     el.resultCard.hidden = true;
@@ -504,6 +563,7 @@
 
   function hideUpgrade() {
     el.upgradeBox.hidden = true;
+    clearPaymentQr();
   }
 
   async function discoverAppsScriptUrl() {
