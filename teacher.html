@@ -3,12 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Teacher Upload Setup</title>
+<title>Connect Your Google Drive</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   :root {
     --blue: #0b57d0;
@@ -19,8 +18,6 @@
     --line: #e3e7ee;
     --bg: #f5f7fb;
     --green: #188038;
-    --radius: 20px;
-    --shadow: 0 14px 36px rgba(32, 33, 36, 0.09);
   }
 
   * { box-sizing: border-box; }
@@ -37,40 +34,70 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  .wrap { max-width: 760px; margin: 0 auto; padding: 32px 20px 64px; }
+  .wrap { max-width: 620px; margin: 0 auto; padding: 36px 20px 56px; }
 
-  header { text-align: center; margin-bottom: 24px; }
+  header { text-align: center; margin-bottom: 22px; }
   .logo {
-    width: 62px;
-    height: 62px;
-    margin: 0 auto 12px;
-    border-radius: 18px;
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 10px;
+    border-radius: 17px;
     background: #fff;
-    box-shadow: var(--shadow);
+    box-shadow: 0 12px 30px rgba(32, 33, 36, 0.12);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.9rem;
+    font-size: 1.8rem;
   }
-  header h1 { margin: 0 0 8px; font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; }
-  header p { margin: 0 auto; max-width: 560px; color: var(--muted); font-size: 0.95rem; line-height: 1.55; }
+  header h1 { margin: 0 0 6px; font-size: 1.45rem; font-weight: 800; letter-spacing: -0.02em; }
+  header p { margin: 0; color: var(--muted); font-size: 0.93rem; line-height: 1.5; }
 
   .card {
     background: #fff;
     border: 1px solid var(--line);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 24px;
-    margin-bottom: 20px;
+    border-radius: 18px;
+    box-shadow: 0 12px 32px rgba(32, 33, 36, 0.08);
+    padding: 22px;
+    margin-bottom: 18px;
   }
-  .card h2 { margin: 0 0 14px; font-size: 1.05rem; font-weight: 800; }
+  .card h2 { margin: 0 0 14px; font-size: 1.02rem; font-weight: 800; }
 
-  .muted { color: var(--muted); font-size: 0.86rem; line-height: 1.55; }
-  .hint { display: block; margin-top: 6px; font-size: 0.77rem; font-weight: 400; color: var(--muted); line-height: 1.45; }
+  .steps {
+    margin: 0 0 16px;
+    padding-left: 20px;
+    color: var(--muted);
+    font-size: 0.87rem;
+    line-height: 1.65;
+  }
+  .steps li { margin-bottom: 4px; }
+  .steps a { color: var(--blue); font-weight: 600; text-decoration: none; }
+  .steps a:hover { text-decoration: underline; }
 
-  label { display: block; font-size: 0.83rem; font-weight: 600; color: #3c4043; margin-bottom: 14px; }
+  .share {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: #f8faff;
+    border: 1px solid #c6dafc;
+    border-radius: 12px;
+    padding: 13px 14px;
+    margin-bottom: 15px;
+  }
+  .share-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+  .share strong { font-size: 0.93rem; word-break: break-all; }
 
-  input[type="url"], input[type="text"] {
+  label { display: block; font-size: 0.82rem; font-weight: 600; color: #3c4043; margin-bottom: 14px; }
+
+  input[type="text"] {
     width: 100%;
     height: 46px;
     margin-top: 6px;
@@ -105,118 +132,75 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
   }
   .btn:hover { background: #f8fafc; }
   .btn:active { transform: scale(0.98); }
   .btn:disabled { opacity: 0.55; cursor: default; transform: none; }
-  a.btn { text-decoration: none; }
   .btn.primary {
     background: var(--blue);
     border-color: var(--blue);
     color: #fff;
     width: 100%;
     min-height: 50px;
-    font-size: 0.97rem;
+    font-size: 0.96rem;
     box-shadow: 0 10px 22px rgba(11, 87, 208, 0.25);
   }
   .btn.primary:hover { background: var(--blue-dark); }
-  .btn.ghost { color: var(--blue); border-color: #c6dafc; }
   .btn.small { font-size: 0.78rem; padding: 7px 11px; min-height: 34px; border-radius: 8px; }
 
-  .steps-list {
-    margin: 0 0 16px;
-    padding-left: 20px;
-    color: var(--muted);
-    font-size: 0.87rem;
-    line-height: 1.65;
-  }
-  .steps-list li { margin-bottom: 4px; }
-  .steps-list a { color: var(--blue); font-weight: 600; text-decoration: none; }
-  .steps-list a:hover { text-decoration: underline; }
-
-  .share-box {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    flex-wrap: wrap;
-    background: #f8faff;
-    border: 1px solid #c6dafc;
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 16px;
-  }
-  .share-label {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--muted);
-    font-weight: 700;
-    margin-bottom: 3px;
-  }
-  .share-box strong { font-size: 0.95rem; color: var(--ink); word-break: break-all; }
-
-  .advanced {
-    margin: 4px 0 16px;
-    border-top: 1px solid var(--line);
-    padding-top: 12px;
-  }
-  .advanced summary { cursor: pointer; font-size: 0.82rem; font-weight: 600; color: var(--muted); }
-  .advanced summary:hover { color: var(--ink); }
-  .advanced label { margin-top: 12px; margin-bottom: 0; }
-
-  .connection-status {
-    margin: 14px 0 0;
-    padding: 12px 14px;
+  .status {
+    margin: 13px 0 0;
+    padding: 11px 13px;
     border-radius: 10px;
-    font-size: 0.82rem;
+    font-size: 0.81rem;
     font-weight: 500;
-    line-height: 1.55;
+    line-height: 1.5;
     word-break: break-word;
   }
-  .connection-status.info { background: #f8fafc; color: var(--muted); border: 1px solid var(--line); }
-  .connection-status.success { background: #e6f4ea; color: #137333; border: 1px solid #b7e1c1; }
-  .connection-status.error { background: #fce8e6; color: #a50e0e; border: 1px solid #f6c7c3; }
+  .status.info { background: #f8fafc; color: var(--muted); border: 1px solid var(--line); }
+  .status.success { background: #e6f4ea; color: #137333; border: 1px solid #b7e1c1; }
+  .status.error { background: #fce8e6; color: #a50e0e; border: 1px solid #f6c7c3; }
 
   .result { text-align: center; }
   .result h2 { margin-bottom: 4px; }
-  .result .folder-label { margin: 0 0 16px; color: var(--muted); font-size: 0.88rem; }
+  .folder-label { margin: 0 0 14px; color: var(--muted); font-size: 0.85rem; }
   .qr-box {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 18px;
-    max-width: 300px;
-    margin: 0 auto 16px;
+    padding: 16px;
+    max-width: 290px;
+    margin: 0 auto 14px;
     border: 1px dashed #c6dafc;
-    border-radius: 16px;
+    border-radius: 15px;
     background: #fbfcfe;
-    min-height: 280px;
+    min-height: 270px;
   }
   .qr-box canvas, .qr-box img { display: block; }
   .link-text {
+    display: block;
     text-align: left;
-    font-size: 0.8rem;
-    color: var(--muted);
+    font-size: 0.78rem;
+    color: var(--blue);
     word-break: break-all;
     background: #f8fafc;
     border: 1px solid var(--line);
-    border-radius: 11px;
-    padding: 12px 14px;
-    margin: 0 0 16px;
+    border-radius: 10px;
+    padding: 11px 13px;
+    margin: 0 0 14px;
     line-height: 1.5;
+    text-decoration: none;
   }
+  .link-text:hover { text-decoration: underline; }
   .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 
   .note {
     margin: 0;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     color: var(--muted);
-    line-height: 1.6;
+    line-height: 1.55;
     text-align: center;
   }
-  .note strong { color: var(--ink); }
 
   .toast {
     position: fixed;
@@ -239,91 +223,56 @@
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
   @media (max-width: 520px) {
-    .wrap { padding: 24px 14px 48px; }
-    header h1 { font-size: 1.35rem; }
-    .card { padding: 20px 16px; }
+    .wrap { padding: 26px 14px 44px; }
+    header h1 { font-size: 1.3rem; }
+    .card { padding: 18px 15px; }
   }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div class="logo">🔗</div>
-    <h1>Teacher Upload Setup</h1>
-    <p>Connect your own Google Drive folder, then share one link with your students. Every teacher uses their own folder — no Apps Script deployment or Google sign-in is needed here.</p>
+    <div class="logo">📁</div>
+    <h1>Connect Your Google Drive</h1>
+    <p>Share one folder with the app email, then give students the generated link.</p>
   </header>
 
   <div class="card">
-    <h2>1. Connect your Drive folder</h2>
-    <ol class="steps-list">
-      <li>Open <a href="https://drive.google.com/drive/my-drive" target="_blank" rel="noopener">Google Drive</a> and create a folder.</li>
-      <li>Share that folder with the email below as <strong>Editor</strong>.</li>
-      <li>Paste the folder link here and click <strong>Connect folder</strong>.</li>
+    <h2>1. Connect your folder</h2>
+    <ol class="steps">
+      <li>Create a folder in <a href="https://drive.google.com/drive/my-drive" target="_blank" rel="noopener">Google Drive</a>.</li>
+      <li>Share it with the email below as <strong>Editor</strong>.</li>
+      <li>Paste the folder link here.</li>
     </ol>
 
-    <div class="share-box">
+    <div class="share">
       <div>
-        <div class="share-label">Share with this email</div>
+        <div class="share-label">Share with</div>
         <strong id="ownerEmail">Loading…</strong>
       </div>
-      <button id="copyOwnerEmailBtn" type="button" class="btn small" disabled>Copy email</button>
+      <button id="copyOwnerEmailBtn" type="button" class="btn small" disabled>Copy</button>
     </div>
 
     <label>Drive folder link or ID
       <input id="driveFolderInput" type="text" placeholder="https://drive.google.com/drive/folders/..." autocomplete="off">
-      <span class="hint">Use the folder you shared above. The app reads the folder name automatically.</span>
     </label>
-
-    <label>Access code (optional)
-      <input id="accessCode" type="text" placeholder="Same as UPLOAD_CODE in Code.gs" maxlength="80" autocomplete="off">
-      <span class="hint">Required only if you set UPLOAD_CODE in the Apps Script.</span>
-    </label>
-
-    <details class="advanced">
-      <summary>Advanced: Apps Script URL</summary>
-      <label>Apps Script /exec URL
-        <input id="appsScriptUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
-        <span class="hint">Auto-detected from student_upload.html when it is on the same site. Change only if needed.</span>
-      </label>
-    </details>
 
     <button id="connectFolderBtn" type="button" class="btn primary">Connect folder</button>
-    <p id="connectStatus" class="connection-status" hidden></p>
-  </div>
-
-  <div class="card">
-    <h2>2. Test the connection</h2>
-    <p class="muted">Uploads a tiny test PDF into the connected folder. You can delete it from Google Drive afterwards.</p>
-    <button id="testDriveBtn" type="button" class="btn">Test Drive connection</button>
-    <p id="connectionStatus" class="connection-status" hidden></p>
-  </div>
-
-  <div class="card">
-    <h2>3. Create the student link</h2>
-    <label>Student page URL
-      <input id="studentUrl" type="url" placeholder="https://yoursite.com/student_upload.html" autocomplete="off">
-      <span class="hint">The address where you hosted <strong>student_upload.html</strong>.</span>
-    </label>
-    <label>Folder name shown to students
-      <input id="folderName" type="text" placeholder="Exam_Uploads" maxlength="60" autocomplete="off">
-      <span class="hint">Filled from the connected folder; you can change how it appears to students.</span>
-    </label>
-    <button id="generateBtn" type="button" class="btn primary">Create link and QR code</button>
+    <p id="connectStatus" class="status" hidden></p>
   </div>
 
   <div id="resultCard" class="card result" hidden>
-    <h2>Ready to share</h2>
+    <h2>2. Your student link</h2>
     <p id="resultFolder" class="folder-label"></p>
     <div id="qrBox" class="qr-box"></div>
-    <p id="linkText" class="link-text"></p>
+    <a id="linkText" class="link-text" target="_blank" rel="noopener"></a>
     <div class="actions">
       <button id="copyBtn" type="button" class="btn">Copy link</button>
-      <button id="openBtn" type="button" class="btn ghost">Open student page</button>
       <button id="printBtn" type="button" class="btn">Print QR</button>
     </div>
   </div>
 
-  <p class="note"><strong>Every teacher connects their own folder.</strong> The app account only gets edit access to the folder you share. No per-teacher Apps Script or Google sign-in is required. Keep the student link private if you use an access code.</p>
+  <p class="note">The app account only gets edit access to the folder you share. No Apps Script or Google sign-in is needed for teachers.</p>
 </div>
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -332,46 +281,35 @@
 (function () {
   'use strict';
 
-  var STORAGE_KEY = 'teacherUploadSetupV2';
-  var LEGACY_KEY = 'uploadLinkSettingsV1';
+  var STORAGE_KEY = 'teacherUploadSetupV3';
+  var LEGACY_KEYS = ['teacherUploadSetupV2', 'uploadLinkSettingsV1'];
 
   var state = {
     link: '',
     qrDataUrl: '',
     folderId: '',
     folderName: '',
-    ownerEmail: ''
+    ownerEmail: '',
+    appsUrl: ''
   };
 
   var el = {
     ownerEmail: document.getElementById('ownerEmail'),
     copyOwnerEmailBtn: document.getElementById('copyOwnerEmailBtn'),
     driveFolderInput: document.getElementById('driveFolderInput'),
-    accessCode: document.getElementById('accessCode'),
-    appsScriptUrl: document.getElementById('appsScriptUrl'),
     connectFolderBtn: document.getElementById('connectFolderBtn'),
     connectStatus: document.getElementById('connectStatus'),
-    testDriveBtn: document.getElementById('testDriveBtn'),
-    connectionStatus: document.getElementById('connectionStatus'),
-    studentUrl: document.getElementById('studentUrl'),
-    folderName: document.getElementById('folderName'),
-    generateBtn: document.getElementById('generateBtn'),
     resultCard: document.getElementById('resultCard'),
     resultFolder: document.getElementById('resultFolder'),
     qrBox: document.getElementById('qrBox'),
     linkText: document.getElementById('linkText'),
     copyBtn: document.getElementById('copyBtn'),
-    openBtn: document.getElementById('openBtn'),
     printBtn: document.getElementById('printBtn'),
     toast: document.getElementById('toast')
   };
 
   function defaultStudentUrl() {
-    try {
-      return new URL('student_upload.html', window.location.href).href;
-    } catch (err) {
-      return 'student_upload.html';
-    }
+    return new URL('student_upload.html', window.location.href).href;
   }
 
   function showToast(message) {
@@ -438,15 +376,6 @@
     return '';
   }
 
-  function sanitizeFolderName(value) {
-    return String(value || '')
-      .replace(/[^A-Za-z\u0590-\u05FF0-9 _\-]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .slice(0, 60)
-      .trim();
-  }
-
   function setOwnerEmail(value) {
     el.ownerEmail.textContent = value;
     var usable = value && value !== '—' && value !== 'Loading…';
@@ -455,60 +384,45 @@
 
   function setConnectStatus(message, kind) {
     el.connectStatus.textContent = message;
-    el.connectStatus.className = 'connection-status ' + (kind || 'info');
+    el.connectStatus.className = 'status ' + (kind || 'info');
     el.connectStatus.hidden = false;
   }
 
-  function setConnectionStatus(message, kind) {
-    el.connectionStatus.textContent = message;
-    el.connectionStatus.className = 'connection-status ' + (kind || 'info');
-    el.connectionStatus.hidden = false;
-  }
-
   function loadSettings() {
-    var saved = null;
-    try {
-      saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-    } catch (err) {
-      saved = null;
-    }
-    if (!saved) {
+    var settings = {};
+    var keys = [STORAGE_KEY].concat(LEGACY_KEYS);
+    for (var i = 0; i < keys.length; i++) {
       try {
-        saved = JSON.parse(localStorage.getItem(LEGACY_KEY) || 'null');
-      } catch (err) {
-        saved = null;
-      }
+        var raw = localStorage.getItem(keys[i]);
+        if (raw) {
+          settings = JSON.parse(raw);
+          break;
+        }
+      } catch (err) {}
     }
-    var settings = saved || {};
-    el.studentUrl.value = settings.studentUrl || defaultStudentUrl();
-    el.folderName.value = settings.folderName || '';
-    el.accessCode.value = settings.accessCode || '';
-    el.appsScriptUrl.value = settings.appsScriptUrl || '';
+
+    state.appsUrl = settings.appsScriptUrl || '';
     state.folderId = settings.driveFolderId || '';
     state.folderName = settings.driveFolderName || '';
-    el.driveFolderInput.value = state.folderId || '';
-
-    if (state.folderId) {
-      setConnectStatus('Connected folder: "' + (state.folderName || state.folderId) + '". You can test it in step 2 and create the student link in step 3.', 'success');
-      if (!el.folderName.value) {
-        el.folderName.value = state.folderName || '';
-      }
-    }
 
     var params = new URLSearchParams(window.location.search);
     var execParam = params.get('exec');
     if (execParam) {
-      el.appsScriptUrl.value = execParam;
+      state.appsUrl = execParam;
+    }
+
+    el.driveFolderInput.value = state.folderId || '';
+
+    if (state.folderId) {
+      setConnectStatus('Saved folder: "' + (state.folderName || 'your folder') + '". Click Connect folder to verify it.', 'success');
+      renderResult(false);
     }
   }
 
   function saveSettings() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        studentUrl: el.studentUrl.value.trim(),
-        folderName: el.folderName.value.trim(),
-        accessCode: el.accessCode.value.trim(),
-        appsScriptUrl: el.appsScriptUrl.value.trim(),
+        appsScriptUrl: state.appsUrl,
         driveFolderId: state.folderId,
         driveFolderName: state.folderName
       }));
@@ -516,13 +430,12 @@
   }
 
   async function discoverAppsScriptUrl() {
-    if (el.appsScriptUrl.value.trim()) {
+    if (state.appsUrl) {
       return;
     }
-    var studentUrl = el.studentUrl.value.trim() || defaultStudentUrl();
     var pageUrl;
     try {
-      pageUrl = new URL(studentUrl, window.location.href);
+      pageUrl = new URL(defaultStudentUrl());
     } catch (err) {
       return;
     }
@@ -536,8 +449,9 @@
       }
       var html = await response.text();
       var match = html.match(/https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec/);
-      if (match && !el.appsScriptUrl.value.trim()) {
-        el.appsScriptUrl.value = match[0];
+      if (match) {
+        state.appsUrl = match[0];
+        saveSettings();
       }
     } catch (err) {
       console.error('Could not read the student page to find the Apps Script URL:', err);
@@ -545,29 +459,31 @@
   }
 
   async function loadBackendInfo() {
-    var url = el.appsScriptUrl.value.trim();
-    if (!url) {
+    if (!state.appsUrl) {
+      await discoverAppsScriptUrl();
+    }
+    if (!state.appsUrl) {
       setOwnerEmail('—');
-      setConnectStatus('Could not find the Apps Script URL. Open "Advanced" and paste the /exec URL.', 'error');
+      setConnectStatus('Could not find the Apps Script URL. Open this page with ?exec=YOUR_EXEC_URL.', 'error');
       return;
     }
 
     setOwnerEmail('Loading…');
     try {
-      var response = await fetch(url, { method: 'GET', redirect: 'follow', cache: 'no-store' });
+      var response = await fetch(state.appsUrl, { method: 'GET', redirect: 'follow', cache: 'no-store' });
       var text = await response.text();
       var data;
       try {
         data = JSON.parse(text);
       } catch (parseErr) {
         setOwnerEmail('—');
-        setConnectStatus('The Apps Script URL returned HTML instead of JSON. The deployment is not public (or the URL is wrong). Set Execute as: Me and Who has access: Anyone, deploy a new version, and use the /exec URL.', 'error');
+        setConnectStatus('The backend is not public or the URL is wrong. Set Execute as: Me and Who has access: Anyone, then deploy a new version.', 'error');
         return;
       }
 
       if (!data || data.ok !== true) {
         setOwnerEmail('—');
-        setConnectStatus('The Apps Script URL returned an unexpected response.', 'error');
+        setConnectStatus('The backend returned an unexpected response.', 'error');
         return;
       }
 
@@ -575,18 +491,18 @@
       setOwnerEmail(state.ownerEmail || '—');
 
       if (!state.ownerEmail) {
-        setConnectStatus('The backend is reachable but did not return a sharing email. Deploy the new Code.gs as a new version.', 'error');
+        setConnectStatus('The backend did not return a sharing email. Deploy the new Code.gs as a new version.', 'error');
       } else if (!state.folderId) {
-        setConnectStatus('Share your Drive folder with the email above as Editor, then paste the folder link below.', 'info');
+        setConnectStatus('Share your folder with the email above as Editor, then paste the folder link.', 'info');
       }
     } catch (err) {
       console.error('Backend info error:', err);
       setOwnerEmail('—');
-      setConnectStatus('Could not reach the Apps Script URL. Make sure it is the /exec URL and the deployment is public (Anyone).', 'error');
+      setConnectStatus('Could not reach the backend. Make sure the /exec URL is public (Anyone).', 'error');
     }
   }
 
-  function folderErrorText(data, prefix) {
+  function folderErrorText(data) {
     var code = data && data.errorCode ? data.errorCode : 'ERROR';
     var message = data && data.message ? data.message : 'Unknown error';
     var hint = '';
@@ -595,23 +511,21 @@
         ? ' Share the folder with ' + state.ownerEmail + ' as Editor.'
         : ' Share the folder with the app email as Editor.';
     } else if (code === 'FOLDER_ACCESS') {
-      hint = ' Change the folder permission to Editor (not Viewer).';
+      hint = ' Change the sharing permission to Editor (not Viewer).';
     } else if (code === 'INVALID_FOLDER') {
       hint = ' Paste a valid Google Drive folder link or ID.';
     } else if (code === 'INVALID_ACCESS') {
-      hint = ' Check the access code (UPLOAD_CODE in Code.gs).';
+      hint = ' Leave UPLOAD_CODE empty in Code.gs, or contact the app owner.';
     }
-    return (prefix || 'Connection failed') + ': ' + code + ' — ' + message + hint;
+    return 'Folder connection failed: ' + code + ' — ' + message + hint;
   }
 
   async function connectFolder() {
-    var url = el.appsScriptUrl.value.trim();
-    if (!url) {
+    if (!state.appsUrl) {
       await discoverAppsScriptUrl();
-      url = el.appsScriptUrl.value.trim();
     }
-    if (!url) {
-      setConnectStatus('Could not find the Apps Script URL. Open "Advanced" and paste the /exec URL.', 'error');
+    if (!state.appsUrl) {
+      setConnectStatus('Could not find the Apps Script URL. Open this page with ?exec=YOUR_EXEC_URL.', 'error');
       return;
     }
 
@@ -625,14 +539,10 @@
     setConnectStatus('Checking the folder...', 'info');
 
     try {
-      var response = await fetch(url, {
+      var response = await fetch(state.appsUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: 'checkFolder',
-          folderId: folderId,
-          k: el.accessCode.value.trim()
-        }),
+        body: JSON.stringify({ action: 'checkFolder', folderId: folderId }),
         redirect: 'follow'
       });
       var text = await response.text();
@@ -640,7 +550,7 @@
       try {
         data = JSON.parse(text);
       } catch (parseErr) {
-        setConnectStatus('The Apps Script URL returned HTML instead of JSON. The deployment is not public (or the URL is wrong).', 'error');
+        setConnectStatus('The backend returned HTML instead of JSON. The deployment is not public or the URL is wrong.', 'error');
         return;
       }
 
@@ -649,111 +559,24 @@
         state.folderId = info.folderId || folderId;
         state.folderName = info.folderName || '';
         el.driveFolderInput.value = state.folderId;
-        if (!el.folderName.value.trim()) {
-          el.folderName.value = state.folderName || '';
-        }
         saveSettings();
-        setConnectStatus('Folder connected: "' + (state.folderName || state.folderId) + '". You can test it in step 2 and create the student link in step 3.', 'success');
-        el.connectionStatus.hidden = true;
-        el.connectionStatus.textContent = '';
+        setConnectStatus('Connected to "' + (state.folderName || state.folderId) + '". Your student link is ready below.', 'success');
+        renderResult(true);
       } else {
-        setConnectStatus(folderErrorText(data, 'Folder connection failed'), 'error');
+        setConnectStatus(folderErrorText(data), 'error');
       }
     } catch (err) {
       console.error('Connect folder error:', err);
-      setConnectStatus('Could not reach the Apps Script URL. Check that it is the /exec URL and the deployment is public (Anyone).', 'error');
+      setConnectStatus('Could not reach the backend. Check the /exec URL and that the deployment is public (Anyone).', 'error');
     } finally {
       el.connectFolderBtn.disabled = false;
     }
   }
 
-  function buildTestPdfBase64() {
-    if (!window.jspdf || !window.jspdf.jsPDF) {
-      throw new Error('PDF library did not load.');
-    }
-    var doc = new window.jspdf.jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    doc.setFontSize(18);
-    doc.text('Drive connection test', 20, 25);
-    doc.setFontSize(10);
-    doc.text('This file was created by the teacher page to verify the Drive connection.', 20, 35);
-    doc.text('You can delete it.', 20, 42);
-    var uri = doc.output('datauristring');
-    return uri.slice(uri.indexOf(',') + 1);
-  }
-
-  async function testDriveConnection() {
-    var url = el.appsScriptUrl.value.trim();
-    if (!url) {
-      await discoverAppsScriptUrl();
-      url = el.appsScriptUrl.value.trim();
-    }
-    if (!url) {
-      setConnectionStatus('Apps Script URL is missing. Open "Advanced" and paste it.', 'error');
-      return;
-    }
-    if (!state.folderId) {
-      setConnectionStatus('Connect your Drive folder first (step 1).', 'error');
-      return;
-    }
-
-    var inputId = extractFolderId(el.driveFolderInput.value);
-    if (inputId && inputId !== state.folderId) {
-      setConnectionStatus('The folder link changed. Click "Connect folder" first.', 'error');
-      return;
-    }
-
-    if (!window.jspdf || !window.jspdf.jsPDF) {
-      setConnectionStatus('The PDF library did not load. Check your internet connection and reload the page.', 'error');
-      return;
-    }
-
-    el.testDriveBtn.disabled = true;
-    setConnectionStatus('Testing... This creates a small PDF in the connected folder.', 'info');
-
-    try {
-      var pdfBase64 = buildTestPdfBase64();
-      var response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: 'upload',
-          name: 'Connection Test',
-          folder: state.folderName || el.folderName.value.trim(),
-          folderId: state.folderId,
-          k: el.accessCode.value.trim(),
-          mimeType: 'application/pdf',
-          fileBase64: pdfBase64
-        }),
-        redirect: 'follow'
-      });
-      var text = await response.text();
-      var data;
-      try {
-        data = JSON.parse(text);
-      } catch (parseErr) {
-        setConnectionStatus('The Apps Script URL returned HTML instead of JSON. The deployment is not public (or the URL is wrong).', 'error');
-        return;
-      }
-
-      if (data && data.ok === true) {
-        var savedName = data.data && data.data.fileName ? data.data.fileName : 'the test PDF';
-        var savedFolder = data.data && data.data.folderName ? data.data.folderName : (state.folderName || 'the connected folder');
-        setConnectionStatus('Drive connected. A test PDF was saved as "' + savedName + '" in the folder "' + savedFolder + '". You can delete it from Drive.', 'success');
-      } else {
-        setConnectionStatus(folderErrorText(data, 'Drive connection failed'), 'error');
-      }
-    } catch (err) {
-      console.error('Drive connection test error:', err);
-      setConnectionStatus('Could not reach the Apps Script URL. Check that it is the /exec URL and the deployment is public (Anyone).', 'error');
-    } finally {
-      el.testDriveBtn.disabled = false;
-    }
-  }
-
-  function buildLink(studentUrl, folderName, accessCode, folderId) {
+  function buildLink(studentUrl, folderName, folderId) {
     var url;
     try {
-      url = new URL(studentUrl, window.location.href);
+      url = new URL(studentUrl);
     } catch (err) {
       return '';
     }
@@ -762,50 +585,30 @@
     }
     url.searchParams.set('folder', folderName);
     url.searchParams.set('folderId', folderId);
-    if (accessCode) {
-      url.searchParams.set('k', accessCode);
-    } else {
-      url.searchParams.delete('k');
-    }
+    url.searchParams.delete('k');
     return url.toString();
   }
 
-  function generate() {
-    var studentUrl = el.studentUrl.value.trim();
-    var displayName = sanitizeFolderName(el.folderName.value) || sanitizeFolderName(state.folderName);
-    var accessCode = el.accessCode.value.trim();
-
-    if (!studentUrl) {
-      showToast('Enter the hosted student page URL.');
-      return;
-    }
+  function renderResult(scrollToIt) {
     if (!state.folderId) {
-      showToast('Connect your Drive folder first (step 1).');
       return;
     }
-    var inputId = extractFolderId(el.driveFolderInput.value);
-    if (inputId && inputId !== state.folderId) {
-      showToast('Click "Connect folder" to apply the new folder link.');
-      return;
-    }
-    if (!displayName) {
-      displayName = 'Uploads';
-    }
-    el.folderName.value = displayName;
-
-    var link = buildLink(studentUrl, displayName, accessCode, state.folderId);
+    var displayName = state.folderName || 'Uploads';
+    var link = buildLink(defaultStudentUrl(), displayName, state.folderId);
     if (!link) {
-      showToast('Use a full https:// address for the student page.');
+      showToast('Open this page from the hosted site to create the student link.');
       return;
     }
 
-    saveSettings();
     state.link = link;
     el.resultCard.hidden = false;
-    el.resultFolder.textContent = 'Destination folder: ' + displayName;
+    el.resultFolder.textContent = 'Folder: ' + displayName;
+    el.linkText.href = link;
     el.linkText.textContent = link;
     renderQr(link);
-    el.resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (scrollToIt) {
+      el.resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   function renderQr(link) {
@@ -847,13 +650,6 @@
     await copyText(state.link, 'Link copied.');
   }
 
-  function openPage() {
-    if (!state.link) {
-      return;
-    }
-    window.open(state.link, '_blank', 'noopener');
-  }
-
   function printQr() {
     if (!state.link) {
       return;
@@ -892,24 +688,20 @@
     copyText(state.ownerEmail, 'Email copied.');
   }
 
-  el.connectFolderBtn.addEventListener('click', connectFolder);
-  el.testDriveBtn.addEventListener('click', testDriveConnection);
-  el.generateBtn.addEventListener('click', generate);
   el.copyOwnerEmailBtn.addEventListener('click', copyOwnerEmail);
+  el.connectFolderBtn.addEventListener('click', connectFolder);
   el.copyBtn.addEventListener('click', copyLink);
-  el.openBtn.addEventListener('click', openPage);
   el.printBtn.addEventListener('click', printQr);
-
-  el.appsScriptUrl.addEventListener('change', function () {
-    state.ownerEmail = '';
-    setOwnerEmail('Loading…');
-    saveSettings();
-    loadBackendInfo();
+  el.driveFolderInput.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      connectFolder();
+    }
   });
 
   async function init() {
     loadSettings();
-    if (!el.appsScriptUrl.value.trim()) {
+    if (!state.appsUrl) {
       await discoverAppsScriptUrl();
     }
     await loadBackendInfo();
